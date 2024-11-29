@@ -1,0 +1,7 @@
+0) Quiucker action items on JIRA
+1) Edit code to stop producing deprecation warnings --> future proofing
+2) Edit RegenerationScript.py to be more efficient --> Reduce possibility of data loss
+3) Explicit notation of Python module requirements and dependencies
+4) Physics robustness checks
+5) Tidy visual display
+6) Packaging this thing up
