@@ -2,21 +2,13 @@ import os.path
 
 FilesExist = True
 for ifile in ["df_2022", "df_test", "df_shortlist", "df_shortlist_scaled", "df_probs_2022", "df_metrics_2022"]:
-<<<<<<< Updated upstream
-    FilesExist = os.path.isfile("share/"+ifile+".csv")
-=======
     FilesExist = os.path.isfile("build/"+ifile+".csv")
->>>>>>> Stashed changes
 
 if not FilesExist:
     import source.RegenerateModels as RegMod
     RegMod.Run()
 
-<<<<<<< Updated upstream
-from source.VisualisationTools import *
-=======
 from source.DashComponents import *
->>>>>>> Stashed changes
 
 NN = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -223,8 +215,4 @@ NN.layout = dbc.Container([
     html.Br(),
     ])
 
-<<<<<<< Updated upstream
 NN.run_server(debug=True, port=7777)
-=======
-NN.run_server(debug=True, port=7777)
->>>>>>> Stashed changes

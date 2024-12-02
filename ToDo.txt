@@ -1,17 +1,8 @@
-<<<<<<< Updated upstream
-0) Quiucker action items on JIRA
-1) Edit code to stop producing deprecation warnings --> future proofing
-=======
 0) Quicker action items on JIRA
 1) Edit code to stop producing deprecation warnings --> future proofing :: Done
 1.5) Make code more readable --> facilitate edits :: Done
->>>>>>> Stashed changes
 2) Edit RegenerationScript.py to be more efficient --> Reduce possibility of data loss
 3) Explicit notation of Python module requirements and dependencies
 4) Physics robustness checks
 5) Tidy visual display
-<<<<<<< Updated upstream
-6) Packaging this thing up
-=======
 6) Packaging this thing up :: Partial with modular layout
->>>>>>> Stashed changes

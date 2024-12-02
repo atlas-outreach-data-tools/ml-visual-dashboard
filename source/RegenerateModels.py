@@ -86,11 +86,7 @@ def Run():
         del df
 
     # #save focus data for further easy access
-<<<<<<< Updated upstream
-    df_2022.to_csv('share/df_2022.csv', index=False)
-=======
     df_2022.to_csv('build/df_2022.csv', index=False)
->>>>>>> Stashed changes
     # define features
     Feats = df_2022.drop(columns=['Event','totalWeight']).columns
 
