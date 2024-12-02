@@ -1,6 +1,11 @@
 import os.path
+from pathlib import Path 
 
 FilesExist = True
+idir = Path("build/") 
+if not os.path.isdir("build"):
+    idir.mkdir()
+
 for ifile in ["df_2022", "df_test", "df_shortlist", "df_shortlist_scaled", "df_probs_2022", "df_metrics_2022"]:
     FilesExist = os.path.isfile("build/"+ifile+".csv")
 

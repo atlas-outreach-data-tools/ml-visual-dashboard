@@ -125,24 +125,15 @@ def Run():
     df_test00 = df_test.astype({'totalWeight':'float16'})
     df_test00 = df_test00.round({'lead_lep_pt': 1, 'sublead_lep_pt': 1, 'mll': 1, 'ETmiss': 1,'dRll': 2, 'dphi_pTll_ETmiss': 3,'fractional_pT_difference': 3, 'ETmiss_over_HT': 3,})
     # save Test data for visualising in Scatter plot in WebApp
-<<<<<<< Updated upstream
-    df_test00.to_csv('share/df_test.csv', index=True, index_label='index')
-=======
     df_test00.to_csv('build/df_test.csv', index=True, index_label='index')
->>>>>>> Stashed changes
 
     # form a shortlist df from the testing data to use with MLP visualisation
     # split into train and test sets
     df_shortlist, df_shortlist_scaled = shortlist(df_test, X_test_scaled, random_seed=0)
 
     # save Shortlist and Scaled Shortlist for App access
-<<<<<<< Updated upstream
-    df_shortlist.to_csv('share/df_shortlist.csv', index=True, index_label='index')
-    df_shortlist_scaled.to_csv('share/df_shortlist_scaled.csv', index=True, index_label='index')
-=======
     df_shortlist.to_csv('build/df_shortlist.csv', index=True, index_label='index')
     df_shortlist_scaled.to_csv('build/df_shortlist_scaled.csv', index=True, index_label='index')
->>>>>>> Stashed changes
 
     # create list of MLP designs (combinations of hidden layers) from (1,) to (10,10,10)
     Designs = []
@@ -190,13 +181,8 @@ def Run():
     df_probs = Probs.astype({'Weight':'float16'})
 
     # # save from Jupyter
-<<<<<<< Updated upstream
-    df_probs.to_csv('share/df_probs_2022.csv', index=True, index_label='index')
-    df_metrics.to_csv('share/df_metrics_2022.csv', index=True, index_label='index')
-=======
     df_probs.to_csv('build/df_probs_2022.csv', index=True, index_label='index')
     df_metrics.to_csv('build/df_metrics_2022.csv', index=True, index_label='index')
->>>>>>> Stashed changes
 
 if __name__ == "__main__":
     print("Regenerating files.")
