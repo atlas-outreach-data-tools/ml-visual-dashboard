@@ -4,14 +4,14 @@ The App is built in Dash framework (https://dash.plotly.com) and can be run in a
 
 ## Quick start
 
-###Conda setup
+### Conda setup
 If you have Conda, simply run
 ```
 source setup.sh
 ```
 First time initialisation creates a suitable Conda Python environment with the appropriate dependencies for this App.
 
-###Running the App
+### Running the App
 To run the ML visual dashboard in a local environment, do
 ```
 python runApp.py
