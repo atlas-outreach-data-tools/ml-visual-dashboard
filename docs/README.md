@@ -4,9 +4,34 @@ The App is built in Dash framework (https://dash.plotly.com) and can be run in a
 
 ## Quick start
 
+###Conda setup
+If you have Conda, simply run
+```
+source setup.sh
+```
+First time initialisation creates a suitable Conda Python environment with the appropriate dependencies for this App.
+
+###Running the App
+To run the ML visual dashboard in a local environment, do
+```
+python runApp.py
+```
+
+and copy the provided link into a web browser. It should look something like
+```
+http://127.0.0.1:7777
+```
+
 ## Package components
 
 ## Backend data
+
+Backend data needed to power the various plots and displays on the UI are generated and stored in **csv** format.
+Once **RegenerateModels.py** has been called once (either through **setup.sh** or in isolation), the ML visual 
+dashboard can run entirely disconnected from the internet.
+
+The backend data is generated using ATLAS Open Data and using it to train and assess various scikit-learn neural 
+network configurations. The setup is seeded so should lead to reproducible results accross machines. 
 
 ## Licensing
 
