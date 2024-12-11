@@ -185,7 +185,22 @@ def Run():
     df_metrics.to_csv('build/df_metrics_2022.csv', index=True, index_label='index')
 
 if __name__ == "__main__":
-    print("Regenerating files.")
-    Run()
+    import os.path
+    from pathlib import Path
+
+    FilesExist = True	
+    idir = Path("build/")
+    if not os.path.isdir("build"):
+        idir.mkdir()
+
+    for ifile in ["df_2022", "df_test", "df_shortlist", "df_shortlist_scaled", "df_probs_2022", "df_metrics_2022"]:
+        FilesExist = os.path.isfile("build/"+ifile+".csv")
+        if not FilesExist:
+            print("Regenerating files.")
+            Run()
+            break
+
+    print("HOT TO GO!")
+
 else:
     print("Imported tools to Regenerate data files.")
