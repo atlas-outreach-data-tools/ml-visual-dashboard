@@ -14,8 +14,28 @@ if not FilesExist:
     RegMod.Run()
 
 from source.DashComponents import *
+from assets.text import PageHeaders, PageText
 
 NN = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+ATLASLogo = dbc.Card(
+    [
+        dbc.CardImg(src="assets/atlas_logo.png"),
+        #dbc.CardBody(
+            #[
+                #html.H4("Card title", className="card-title"),
+                #html.P(
+                    #"Some quick example text to build on the card title and "
+                    #"make up the bulk of the card's content.",
+                    #className="card-text",
+                #),
+                #dbc.Button("Go somewhere", color="primary"),
+            #]
+        #),
+    ],
+    style={"width": "18rem"},
+)
+#ATLASLogo = html.Img(src="assets/atlas_logo.png", width=200)
 
 ####################################################################################################################################################
 ####################################################################################################################################################
@@ -23,28 +43,39 @@ NN = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 
 NN.layout = dbc.Container([
+
+   ### Title header and preamble ###
     
+    dbc.Row([ 
+        dbc.Col(ATLASLogo, width="auto"),
+        dbc.Col(html.H1('Visualising machine learning in a search for dark matter',
+                        style={'font-family':'Coustard Black', 'color':'DarkSlateGrey', 'marginTop':100}),
+                width={"size": 8})
+        ]),
+
+    html.Br(),
+    dbc.Row(dbc.Col(html.H2('Searching for dark matter',
+                            style={'font-family':'Coustard Black', 'color':'DarkSlateGrey'}),
+                    width={"size": 8, "offset": 2})),
+
+    dbc.Row(dbc.Col(
+                    dcc.Markdown(
+                          PageText["DMSearches"],
+                          style={'font-size':16, 'font-family':'Coustard'}),
+                          
+                    width={"size": 8, "offset": 2})),
+
     #####################  Scatter plot section ############################################    
     
     html.Br(),
-    dbc.Row(dbc.Col(html.H4('When cut-optimisation is struggling...',
+    dbc.Row(dbc.Col(html.H3('Why not use cut optimisation?',
                             style={'font-family':'Coustard Black', 'color':'DarkSlateGrey'}),
                     width={"size": 8, "offset": 2})),
-    html.Br(),
     dbc.Row(dbc.Col(
                     dcc.Markdown(
-                          "In some cases, bold cut-optimisation approach can be challenging. \
-                          Suppose we are searching for a *dark matter* particle among results of a proton-proton collision. \
-                          We assume that *dark matter* is made of hypothetical particles - WIMPs (weakly interacting massive particles). \
-                          They are produced when Z-boson decays into a pair of WIMPs and a dilepton pair. \
-                          Such event would leave traces similar to other processes, which we know do happen. \
-                          On a graph below, try to play with different combinations of parameters. \
-                          As you may find, the dark matter traces can be easily distinguished from **Non-resonant dilepton** and **Z+jets** processes. \
-                          However, **WZ** and **ZZ** events have such large variety, that they practically hinder the other processes.",
-
-                          style={'font-size':14, 'font-family':'Coustard'}),
-                          
-                    width={"size": 8, "offset": 2})),
+                          PageText["CutOptimisation1"],
+                          style={'font-size':16, 'font-family':'Coustard'}),
+                          width={"size": 8, "offset": 2})),
 
     dbc.Row([
             dbc.Col([
@@ -93,25 +124,25 @@ NN.layout = dbc.Container([
             ), 
 
     html.Br(),
+    dbc.Row(dbc.Col(
+                    dcc.Markdown(PageText["CutOptimisation2"],
+                          style={'font-size':16, 'font-family':'Coustard'}),
+                          
+                    width={"size": 8, "offset": 2})),
+
+    ### Using machine learning ###
+
+    html.Br(),
+    dbc.Row(dbc.Col(html.H2('Using machine learning',
+                            style={'font-family':'Coustard Black', 'color':'DarkSlateGrey'}),
+                    width={"size": 8, "offset": 2})),
+
     dbc.Row(dbc.Col([
-            dcc.Markdown("For convenience, we can approximate our complex 10-dimensional data set to a 2D projection. \
-                         Popular algorithms for such visualisation are UMAP, PCA and t-SNE (check the tabs). \
-                         Now there is no need to go through multiple combinations of parameters. \
-                         However, the setback is that we sacrificied data variance.\
-                         And still hardly can isolate the signal (Dark Matter) by optimising the cut(s).",
+            dcc.Markdown(PageText["MLInfo1"],
+                         style={'font-size':16, 'font-family':'Coustard'}),
 
-                         style={'font-size':14, 'font-family':'Coustard'}),
-            html.Br(),
-            dcc.Markdown("Imagine there are not 10, but 40+ parameters to consider... In such case machine learning inventory can come handy. \
-                         Machine learning algorithms are capable of identifying (very) complex patterns and classifying the Signal (dark matter) from the Background (the other events). \
-                         Among different algorithms, *neural networks* (NN) often produce the best results in HEP. \
-                         Below you can find a model of NN: Multilayer Perceptron (MLP). \
-                         It is pre-trained on Monte Carlo simulated data, and you can tinker with its configuration to check the difference in output. \
-                         Select the number of hidden layers (NN depth) and vary the amount of neurons. \
-                         Then, choose a specific event from the dropdown menu and press the *power button*. \
-                         But don't forget to turn on the *scaler switch* - NN work best with normalised data.",
-
-                         style={'font-size':14, 'font-family':'Coustard'}),
+            dcc.Markdown(PageText["MLInfo2"],
+                         style={'font-size':16, 'font-family':'Coustard'}),
                     ],                                        
                      width={"size": 8, "offset": 2})),
     html.Br(),   
@@ -119,22 +150,22 @@ NN.layout = dbc.Container([
     ####################################################################
     #####################  NN model section ############################
 
-    dbc.Row(dbc.Col(html.H4('Play with Neural Network design',
+    dbc.Row(dbc.Col(html.H3('Play with Neural Network design',
                             style={'font-family':'Coustard Black', 'color':'DarkSlateGrey'}),
                     width={"size": 8, "offset": 2})),
 
     html.Hr(),
     dbc.Row([
         dbc.Col([dbc.Card([dbc.Label('Select event:',
-                                    style={'font-size':11, 'marginBottom':20, 'font-family':'ROG fonts', 'color':'Navy'}),
+                                    style={'font-size':16, 'marginBottom':20, 'font-family':'ROG fonts', 'color':'Navy'}),
                         #html.Hr(),
                         daq.DarkThemeProvider(theme=UI_objects.dark_theme, children=NN_display.Data_Dropdown)], body=True),
                 dbc.Row([dbc.Col(dbc.Card([html.Center(dbc.Label('Scale data:',
-                                                     style={'font-size':11, 'marginBottom':20, 'font-family':'ROG fonts', 'color':'Navy'})),
+                                                     style={'font-size':16, 'marginBottom':20, 'font-family':'ROG fonts', 'color':'Navy'})),
                                           #html.Hr(),
                                           daq.DarkThemeProvider(theme=UI_objects.dark_theme, children=NN_display.Scaler_Switch)], body=True)),
                         dbc.Col(dbc.Card([html.Center(dbc.Label('Start NN:',
-                                                    style={'font-size':11, 'marginBottom':20, 'font-family':'ROG fonts', 'color':'Navy'})),
+                                                    style={'font-size':16, 'marginBottom':20, 'font-family':'ROG fonts', 'color':'Navy'})),
                                           #html.Hr(),
                                           daq.DarkThemeProvider(theme=UI_objects.dark_theme, children=NN_display.Power_Button)], body=True))]),
                 ],
@@ -142,7 +173,7 @@ NN.layout = dbc.Container([
     
         dbc.Col(dbc.Card([
                 dbc.Row(dbc.Col([html.Center(dbc.Label('Number of Hidden Layers:',
-                                            style={'font-size':11, 'marginBottom':20, 'font-family':'ROG fonts', 'color':'Navy'})),
+                                            style={'font-size':16, 'marginBottom':20, 'font-family':'ROG fonts', 'color':'Navy'})),
                                 #html.Br(),
                                 html.Center(NN_display.NN_Depth)], 
                                 width='auto'), 
@@ -180,8 +211,21 @@ NN.layout = dbc.Container([
 
     ####################################################################
     #####################  Histogram section ###########################
+    html.Br(),
+    dbc.Row(dbc.Col(html.H3('Which design is best?',
+                            style={'font-family':'Coustard Black', 'color':'DarkSlateGrey'}),
+                    width={"size": 8, "offset": 2})),
 
+    dbc.Row(dbc.Col(dcc.Markdown(PageText["DesignOptimise"],
+                          style={'font-size':16, 'font-family':'Coustard'}),     
+                    width={"size": 8, "offset": 2})),
 
+    html.Br(),
+    dbc.Row(dbc.Col(html.H2('How do we use our machine learning output? ',
+                            style={'font-family':'Coustard Black', 'color':'DarkSlateGrey'}),
+                    width={"size": 8, "offset": 2})),
+
+    ## Insert description on how to use ML outputs 
     dbc.Row([dbc.Col([
                     dbc.Col(dcc.Graph(id="Hist", config={'displayModeBar':False}),
                             ),
@@ -206,13 +250,10 @@ NN.layout = dbc.Container([
 
     # text after the histogram
     html.Br(),
-    html.Br(),
     dbc.Row(dbc.Col([
                     dcc.Markdown(
-                            'Histogram above shows distribution of the NN outputs of the whole data set. \
-                            Move the slider to select the (signal) data to the right cutting out (background) data to the left',
-
-                            style={'font-size':14, 'font-family':'Coustard'}),
+                            PageText["UsingMLOut"],
+                            style={'font-size':16, 'font-family':'Coustard'}),
 
                             ], width={"size": 8, "offset": 2}),
                     align='center'),

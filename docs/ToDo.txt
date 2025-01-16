@@ -1,8 +1,15 @@
-0) Quicker action items on JIRA
+Priority to-dos:
+- Physics robustness checks of configuration behind the ML 
+- Edit/append text: detail and clarity
+
+-----
 1) Edit code to stop producing deprecation warnings --> future proofing :: Done
 1.5) Make code more readable --> facilitate edits :: Done
-2) Edit RegenerationScript.py to be more efficient --> Reduce possibility of data loss
-3) Explicit notation of Python module requirements and dependencies
+2) Edit RegenerationScript.py to be more efficient :: Started but need to check
+3) Explicit notation of Python module requirements and dependencies :: Done
 4) Physics robustness checks
-5) Tidy visual display
+5) Tidy visual display :: Started. Inact the following:
+	a) Formal header and footer
+	b) Licensing information
+	c) Links to ATLAS Open Data hosting page
 6) Packaging this thing up :: Partial with modular layout
