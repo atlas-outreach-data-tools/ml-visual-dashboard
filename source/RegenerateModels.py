@@ -60,9 +60,9 @@ def balanced_count_split(df, random_seed, fr=0.7):
     df_bkg = df[df['Event']!='DM_300']
 
     train_DM, test_DM = train_test_split(df_DM, train_size=fr, random_state=random_seed)
-    #Oversampling loop??
-
-    train_bkg, test_bkg = train_test_split(df_bkg, train_size=fr, random_state=random_seed, stratify=df_bkg['Event'])
+    #Oversampling:
+    R = len(df_DM)/len(df_bkg)
+    train_bkg, test_bkg = train_test_split(df_bkg, train_size=4*fr*R, random_state=random_seed, stratify=df_bkg['Event'])
 
     df_train = pd.concat([train_bkg,train_DM])
     df_test = pd.concat([test_bkg,test_DM])
@@ -90,9 +90,6 @@ def shortlist(df_test, random_seed, N=3):
 
     df_shortlist = pd.concat(tmp_shortlist)
 
-    # save Shortlist and Scaled Shortlist for App access
-    df_shortlist.to_csv('build/df_shortlist.csv', index=False)#, index_label='index')
-
     return df_shortlist
 
 
@@ -103,7 +100,8 @@ def save_app_test_data(df_test):
     df_test00 = df_test.astype({'totalWeight':'float16'})
     df_test00 = df_test00.round({'lead_lep_pt': 1, 'sublead_lep_pt': 1, 'mll': 1, 'ETmiss': 1,'dRll': 2, 'dphi_pTll_ETmiss': 3,'fractional_pT_difference': 3, 'ETmiss_over_HT': 3,})
     # save Test data for visualising in Scatter plot in WebApp
-    df_test00.to_csv('build/df_test.csv', index=True, index_label='index')    
+    df_test00.to_csv('build/scatter_data.csv', index=True, index_label='index')    
+
 
 def GetMLPDesigns():
     Designs = []
@@ -120,6 +118,7 @@ def GetMLPDesigns():
                 Designs.append((a,b,c))
 
     return Designs
+
 
 def TestMLPDesign(design, seed, X_train_scaled, W_train, Y_train, 
                             X_test_scaled, W_test, Y_test):
@@ -176,9 +175,6 @@ def Run():
     #Save useful data for app
     df_test = df_test.reset_index()
     save_app_test_data(df_test)
-    #form a shortlist df from the testing data to use with MLP visualisation
-    #df_shortlist = shortlist(df_test, random_seed=seed)
-
 
     # create list of MLP designs (combinations of hidden layers) from (1,) to (10,10,10)
     Designs = GetMLPDesigns()
@@ -196,6 +192,7 @@ def Run():
 
     df_probs = pd.concat(Result_probs, axis=1)#, join='inner')
     df_probs['Event'] = df_test['Event']
+    df_probs['weight'] = W_test
     df_probs = df_probs.reset_index()
 
     df_shortlist = shortlist(df_probs, random_seed=seed)
@@ -203,9 +200,9 @@ def Run():
 
     df_metrics = pd.concat(Result_metrics, axis=1)
 
-    df_probs.to_csv('build/df_probs_2022.csv', index=True, index_label='index')
-    df_probs_shortlist.to_csv('build/df_probs_shortlist.csv', index=True, index_label='index')
-    df_metrics.to_csv('build/df_metrics_2022.csv', index=True, index_label='index')
+    df_probs.to_csv('build/MLP_output.csv', index=True, index_label='index')
+    df_probs_shortlist.to_csv('build/events_shortlist_MLP.csv', index=True, index_label='index')
+    df_metrics.to_csv('build/MLP_metrics.csv', index=True, index_label='index')
 
 if __name__ == "__main__":
 
@@ -213,7 +210,7 @@ if __name__ == "__main__":
     if not os.path.isdir("build"):
         idir.mkdir()
 
-    for ifile in ["df_2022", "df_test", "df_probs_shortlist", "df_probs_2022", "df_metrics_2022"]:
+    for ifile in ["MLP_output", "events_shortlist_MLP", "MLP_metrics", "scatter_data", "df_2022"]:
         FilesExist = os.path.isfile("build/"+ifile+".csv")
         if not FilesExist:
             print("Regenerating files.")

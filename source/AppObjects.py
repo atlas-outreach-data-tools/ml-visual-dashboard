@@ -115,7 +115,7 @@ class NNDisplay:
                                   #vertical=True, #persistence=True 
                                   )
 
-        self. Power_Button = daq.PowerButton(id='Power_Button',
+        self.Power_Button = daq.PowerButton(id='Power_Button',
                                     on=False,
                                     color=UIO.dark_theme['primary'],                
                                     )
@@ -191,8 +191,8 @@ class NNDisplay:
 
 class DataBackend:
     def __init__(self):
-        self.df_scatter = pd.read_csv('build/df_test.csv',index_col='index').drop_duplicates()
-        self.df_shortlist = pd.read_csv('build/df_shortlist.csv',index_col='index').drop_duplicates()
-        self.df_shortlist_scaled = pd.read_csv('build/df_shortlist_scaled.csv',index_col='index').drop_duplicates()
-        self.df_probs = pd.read_csv('build/df_probs_2022.csv',index_col='index').drop_duplicates()
-        self.df_metrics = pd.read_csv('build/df_metrics_2022.csv',index_col='index').drop_duplicates()
+        self.df_scatter = pd.read_csv('build/scatter_data.csv',index_col='index').drop_duplicates()
+        self.df_shortlist = pd.read_csv('build/events_shortlist_MLP.csv',index_col='index').drop_duplicates()
+        #self.df_shortlist_scaled = pd.read_csv('build/df_shortlist_scaled.csv',index_col='index').drop_duplicates()
+        self.df_probs = pd.read_csv('build/MLP_output.csv',index_col='index').drop_duplicates()
+        self.df_metrics = pd.read_csv('build/MLP_metrics.csv',index_col='index').drop_duplicates()

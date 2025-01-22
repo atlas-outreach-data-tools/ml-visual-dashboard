@@ -140,8 +140,9 @@ def update_led_values(scaler, power, number_hl, HL1_size, HL2_size, HL3_size):
     elif Nhl == 3:
         design = f'({hl1}, {hl2}, {hl3})'
 
+    design = design
     if scaler==True and power==True:
-        accuracy = data_backend.df_metrics[design].Accuracy.round(2)
+        accuracy = data_backend.df_metrics[design]['Accuracy'].round(2)
         f1_score = data_backend.df_metrics[design]['f1-score'].round(2)
         color = UI_objects.dark_theme['primary']
     else:
@@ -192,12 +193,13 @@ def update_signif_hist(scaler, power, number_hl, HL1_size, HL2_size, HL3_size, c
     elif Nhl == 3:
         design = f'({hl1}, {hl2}, {hl3})'
 
+    design=design+"prediction"
     # make cut and calculate significance
-    df = data_backend.df_probs[['Event','Weight',design]]
+    df = data_backend.df_probs[['Event','weight',design]]
     selection = df[df[design]>=cut]
 
-    W_sig = sum(selection[selection['Event']==1.0]['Weight'])
-    W_bkg = sum(selection['Weight']) - W_sig
+    W_sig = sum(selection[selection['Event']==1.0]['weight'])
+    W_bkg = sum(selection['weight']) - W_sig
     S = (W_sig/np.sqrt(W_bkg)).round(2)
 
     if scaler==True and power==True:
@@ -231,21 +233,22 @@ def legend_hist_update(scaler, power, number_hl, HL1_size, HL2_size, HL3_size, c
     elif Nhl == 3:
         design = f'({hl1}, {hl2}, {hl3})'
 
+    design=design+"prediction"
     # make selection and calculate number of events (sum of weights)
-    df = data_backend.df_probs[['Event','Weight',design]]
+    df = data_backend.df_probs[['Event','weight',design]]
     selection = df[df[design]>=cut]
 
-    now_sig = round(sum(selection[selection['Event']==1.0]['Weight']), 1)
-    now_bkg = round((sum(selection['Weight']) - now_sig), 1)
-    full_sig = round(sum(df[df['Event']==1.0]['Weight']), 1)
-    full_bkg = round((sum(df['Weight']) - full_sig), 1)
+    now_sig = round(sum(selection[selection['Event']==1.0]['weight']), 1)
+    now_bkg = round((sum(selection['weight']) - now_sig), 1)
+    full_sig = round(sum(df[df['Event']==1.0]['weight']), 1)
+    full_bkg = round((sum(df['weight']) - full_sig), 1)
 
     if scaler==True and power==True:
         status = False
-        now_sig = round(sum(selection[selection['Event']==1.0]['Weight']), 1)
-        now_bkg = round((sum(selection['Weight']) - now_sig), 1)
-        full_sig = round(sum(df[df['Event']==1.0]['Weight']), 1)
-        full_bkg = round((sum(df['Weight']) - full_sig), 1)
+        now_sig = round(sum(selection[selection['Event']==1.0]['weight']), 1)
+        now_bkg = round((sum(selection['weight']) - now_sig), 1)
+        full_sig = round(sum(df[df['Event']==1.0]['weight']), 1)
+        full_bkg = round((sum(df['weight']) - full_sig), 1)
     else:
         status = True
         now_sig = now_bkg = full_sig = full_bkg = 50
@@ -286,8 +289,7 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
         Title = "Events in simulated data"        
     elif active_tab == "tab-1":
         Title = "Events in 'real' data"
-        #Color_counts = 'White'
-        Pallete = {'Non-resonant_ll':'DimGray', 'Z+jets':'DimGray', 'WZ':'DimGray', 'ZZ':'DimGray', 'DM_300':'DimGray'}
+        #Color_counts = 'Whitedf        Pallete = {'Non-resonant_ll':'DimGray', 'Z+jets':'DimGray', 'WZ':'DimGray', 'ZZ':'DimGray', 'DM_300':'DimGray'}
         Hover = False
         #Hover_data = {'Event':False, featX:True, featY:True}
 
@@ -534,30 +536,33 @@ def update_MLP(id, scaled, power, number_hl, HL1_size, HL2_size, HL3_size):
 
     # custom input nodes
     if id is not None and scaled==True:
-        event = data_backend.df_shortlist_scaled.loc[id]
+        event = data_backend.df_scatter.iloc[id, :]
         color_input="ForestGreen"       
     elif id is not None and scaled==False:
-        event = data_backend.df_shortlist.drop(columns=['Event','totalWeight']).loc[id]
+        event = data_backend.df_scatter.iloc[id, :].drop(columns=['Event','totalWeight']).loc[id]
         color_input='FireBrick'           
     else:
-        event = data_backend.df_shortlist_scaled.iloc[0]
+        event = data_backend.df_scatter.iloc[0, :]
         color_input='WhiteSmoke'  # hides figures to imitate empty input
 
     for i in range(f):  
+        val = event.iloc[-i+(f-1)]
+        label = UI_objects.Features[-i+(f-1)]
         # input nodes shapes and values
         MLP.add_shape(type="rect",
                       xref="paper", yref="paper",
                       fillcolor="WhiteSmoke",
                       x0=x_pad-0.01, y0=(i+1)/(f+1)-0.03, x1=x_pad+0.035, y1=(i+1)/(f+1)+0.03,
                       line_color="navy", line_width=0.25,
-                      label=dict(text=event.iloc[-i+(f-1)].round(2), font=dict(size=10, color=color_input))
+                      label=dict(text=val, font=dict(size=10, color=color_input))
+                        #text=event.iloc[i+2].round(2), font=dict(size=10, color=color_input))
                       )
         # input feautures labels
         MLP.add_shape(type="rect", xref="paper", yref="paper",
                       fillcolor="white",
                       x0=-0.06, y0=(i+1)/(f+1)-0.03, x1=0.08, y1=(i+1)/(f+1)+0.03,
                       line_color="white",
-                      label=dict(text=UI_objects.Features[-i+(f-1)], textposition="middle right", 
+                      label=dict(text=label, textposition="middle right", 
                                 font=dict(size=11, color='SteelBlue', family='Coustard Black'))
                       )
     # input header
@@ -567,10 +572,9 @@ def update_MLP(id, scaled, power, number_hl, HL1_size, HL2_size, HL3_size):
                   label=dict(text='Input Layer:', font_size=11)
                   )    
       
-
     # custom output nodes
     if id is not None and scaled==True and power==True:
-        sig_prob = data_backend.df_probs[design][id]
+        sig_prob = data_backend.df_probs[design+"prediction"][id]
         bkg_prob = (1-sig_prob).round(2)
         if sig_prob>=0.5:
             Sig_Color="Bisque"
@@ -716,16 +720,17 @@ def update_hist(scaled, power, number_hl, HL1_size, HL2_size, HL3_size, cut, eve
 
 
     if scaled==True and power==True:
-        df = data_backend.df_probs.copy()
-        df_on = df[df["Event"].isin(events)]
-        X = df_on[design]
-        Color=['Signal' if i==1. else 'Background' for i in df_on['Event']]
+        df_on = data_backend.df_probs.copy()
+        df_on["Event"] = (df_on["Event"]=="DM_300").astype(int)
+        df_on = df_on[df_on["Event"].isin(events)]
+        X = df_on[design+"prediction"]
+        Color=['Signal' if i==1 else 'Background' for i in df_on['Event']]
         Title='Output of the Neural Network'
-        Y=df_on['Weight']
+        Y=df_on['weight']
 
     else:
         df = pd.DataFrame({'Event':np.array([0.]*50+[1.]*50),'v':np.array([0.02]*50+[0.98]*50),'w':np.array([1]*100)})
-        df_on = df[df["Event"].isin(events)]
+        df_on = df #[df["Event"].isin(events)]
         X=df_on['v']
         Color=['Signal' if i==0.98 else 'Background' for i in df_on['v']] 
         Title='Ideal output. Activate MLP for reality'
