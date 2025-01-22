@@ -2,6 +2,7 @@
 import random
 import numpy as np
 import pandas as pd
+import os.path
 
 # ML inventory
 from sklearn.preprocessing import StandardScaler
@@ -13,93 +14,12 @@ from sklearn.model_selection import GridSearchCV, train_test_split
 
 seed = 84
 
-# def balanced_count_split(df, random_seed, fr=0.7):
-#     df_train = pd.DataFrame(columns=df.keys())  # frame the training subset
-#     events = df['Event'].unique()               # list all events
-#     train_DM = df[df['Event']=='DM_300'].sample(frac=fr, random_state=random_seed)  # training part of DM subset
-#     train_DM_size = len(train_DM)  # size of training DM subset
-#     full_DM_size = len(df[df['Event']=='DM_300'])  # full size of training DM subset
-#     full_size = len(df)
-#     full_BKG_size = full_size - full_DM_size
-#     k=1
-#     for event in events:
-#         if event!=events[-1]:
-#             df_event = df[df['Event']==event]            # form the current Event subset
+def get_data():
 
-#             full_Event_size = len(df[df['Event']==event])
-#             R = full_Event_size/full_BKG_size
-#             N = train_DM_size*R*4*k
+    if os.path.isfile("build/df_2022.csv"):
+        df_2022 = pd.read_csv('build/df_2022.csv')
+        return df_2022
 
-#             train_part = df_event.sample(n=int(N), random_state=random_seed)  # take a random sample
-#             df_train = pd.concat([df_train,train_part])   # append the training subset
-#     df_train = pd.concat([df_train,train_DM])
-
-#     # now split the rest of data into testing and background (with no DM) subsets
-#     df_rest = df.drop(df_train.index)              # rest = dataset - training subset
-#     df_test = pd.DataFrame(columns=df.keys())      # frame the 'testing' subset
-#     test_DM = df_rest[df_rest['Event']=='DM_300']  # extract all DM data to include in the testing subset
-#     test_DM_size = full_DM_size-train_DM_size
-#     for event in events:
-#         if event!=events[-1]:
-#             df_event = df_rest[df_rest['Event']==event]    # form the current Event subset
-#             full_Event_size = len(df[df['Event']==event])
-#             N = full_Event_size*(1-fr)
-#             test_part = df_event.sample(n=int(N), random_state=random_seed)  # take random sample
-#             df_test = pd.concat([df_test,test_part])      # append the background subset
-#     df_test = pd.concat([df_test,test_DM])
-
-#     return df_train, df_test
-
-def balanced_count_split(df, random_seed, fr=0.7):
-    
-    df_train = df_test = pd.DataFrame(columns=df.keys())  # frame the training subset
-    events = df['Event'].unique()               # list all events
-    
-    df_DM = df[df['Event']=='DM_300']
-    df_bkg = df[df['Event']!='DM_300']
-
-    train_DM, test_DM = train_test_split(df_DM, train_size=fr, random_state=random_seed)
-    train_bkg, test_bkg = train_test_split(df_bkg, train_size=fr, random_state=random_seed, stratify=df_bkg['Event'])
-
-    # train_DM_size = len(train_DM)  # size of training DM subset
-    # full_DM_size = len(df[df['Event']=='DM_300'])  # full size of training DM subset
-    # full_size = len(df)
-    # full_BKG_size = full_size - full_DM_size
-    # k=1
-
-    # for event in events:
-    #     if event!='DM_300':
-    #         df_event = df[df['Event']==event]            # form the current Event subset
-
-    #         full_Event_size = len(df[df['Event']==event])
-    #         R = 1/full_BKG_size
-    #         N_train = train_DM_size*R*4*k
-    #         N_test = (1-fr)
-
-    #         train_part, test_part = train_test_split(df_event, N_train, N_test, random_state=random_seed)
-
-    #         df_train = pd.concat([df_train,train_part])   # append the training subset
-    #         df_test = pd.concat([df_test,test_part])
-
-    df_train = pd.concat([train_bkg,train_DM])
-    df_test = pd.concat([test_bkg,test_DM])
-
-    return df_train, df_test
-
-def shortlist(df_test, x_scaled, random_seed, N=3):
-    df_shortlist = pd.DataFrame(columns=df_test.keys())  # frame the subset
-    events = df_test['Event'].unique()                   # list all events
-    for event in events:
-        df_event = df_test[df_test['Event']==event]       # extract the current class data
-        short_part = df_event.sample(n=N, random_state=random_seed)  # take a random sample of N size
-        df_shortlist = pd.concat([df_shortlist,short_part])   # append the training subset
-
-    df_shortlist_scaled = pd.DataFrame(x_scaled, index=df_test.index)
-    df_shortlist_scaled = df_shortlist_scaled.loc[df_shortlist.index]
-
-    return df_shortlist, df_shortlist_scaled
-
-def Run():
     # make a list of all background processes
     processes = ['nonresll', 'Zjets', 'WZ', 'ZZ'] # for 2022 data
 
@@ -119,117 +39,181 @@ def Run():
             name=process
         df.insert(loc=0, column='Event', value=name)
         df_2022 = pd.concat([df_2022,df], ignore_index=True)
-        del df
-
-    # #save focus data for further easy access
-    df_2022.to_csv('build/df_2022.csv', index=False)
-    # define features
-    Feats = df_2022.drop(columns=['Event','totalWeight']).columns
 
     # drop N_bjets
     df_app = df_2022.drop('N_bjets', axis=1)
     # cut by ETmiss
     df_app = df_app[df_app['ETmiss']>90.24]
 
-    # split into train and test sets
-    df_train, df_test = balanced_count_split(df_app, random_seed=seed)
+    # #save focus data for further easy access
+    df_app.to_csv('build/df_2022.csv', index=False)
+        
 
-    # split the train/test datasets into the feature, labels and weights subsets
-    X_train = df_train.drop(['Event','totalWeight'], axis=1).values
-    W_train = df_train['totalWeight'].values.astype('float64')
-    Y_train = df_train['Event'].values
+    return df_app
+
+def balanced_count_split(df, random_seed, fr=0.7):
+    
+    df_train = df_test = pd.DataFrame(columns=df.keys())  # frame the training subset
+    events = df['Event'].unique()               # list all events
+    
+    df_DM = df[df['Event']=='DM_300']
+    df_bkg = df[df['Event']!='DM_300']
+
+    train_DM, test_DM = train_test_split(df_DM, train_size=fr, random_state=random_seed)
+    #Oversampling loop??
+
+    train_bkg, test_bkg = train_test_split(df_bkg, train_size=fr, random_state=random_seed, stratify=df_bkg['Event'])
+
+    df_train = pd.concat([train_bkg,train_DM])
+    df_test = pd.concat([test_bkg,test_DM])
+
+    return df_train, df_test
+
+def InWeightOutSplit(df):
+
+    # split the train/test datasets into the feature, labels and weights subsets and add indexing
+    X_train = df.drop(['Event','totalWeight'], axis=1).values
+    W_train = df['totalWeight'].values.astype('float64')
+    Y_train = df['Event'].values
     Y_train = np.array([1 if e=='DM_300' else 0 for e in Y_train])  # binarise classes (1-Signal, 0-Background)
 
-    X_test = df_test.drop(['Event','totalWeight'], axis=1).values
-    W_test = df_test['totalWeight'].values.astype('float64')
-    Y_test = df_test['Event'].values
-    Y_test = np.array([1 if e=='DM_300' else 0 for e in Y_test])  # binarise classes (1-Signal, 0-Background)
+    return X_train, W_train, Y_train
 
-    # Initialise the Scaler
-    scaler = StandardScaler()
+def shortlist(df_test, random_seed, N=3):
+    #df_shortlist = pd.DataFrame(columns=df_test.keys())  # frame the subset
+    events = df_test['Event'].unique()                   # list all events
+    tmp_shortlist = []
+    for event in events:
+        df_event = df_test[df_test['Event']==event]       # extract the current class data
+        short_part = df_event.sample(n=N, random_state=random_seed)  # take a random sample of N size
+        tmp_shortlist.append(short_part[['index', 'Event']]) 
 
-    # Scale the sets
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
+    df_shortlist = pd.concat(tmp_shortlist)
 
-    # extract test set ids
-    test_ids = df_test.reset_index()
-    test_ids = test_ids['index']
+    # save Shortlist and Scaled Shortlist for App access
+    df_shortlist.to_csv('build/df_shortlist.csv', index=False)#, index_label='index')
+
+    return df_shortlist
+
+
+def save_app_test_data(df_test):
 
     ### only for App purposes  ##
     # reduce size
     df_test00 = df_test.astype({'totalWeight':'float16'})
     df_test00 = df_test00.round({'lead_lep_pt': 1, 'sublead_lep_pt': 1, 'mll': 1, 'ETmiss': 1,'dRll': 2, 'dphi_pTll_ETmiss': 3,'fractional_pT_difference': 3, 'ETmiss_over_HT': 3,})
     # save Test data for visualising in Scatter plot in WebApp
-    df_test00.to_csv('build/df_test.csv', index=True, index_label='index')
+    df_test00.to_csv('build/df_test.csv', index=True, index_label='index')    
 
-    # form a shortlist df from the testing data to use with MLP visualisation
-    # split into train and test sets
-    df_shortlist, df_shortlist_scaled = shortlist(df_test, X_test_scaled, random_seed=0)
-
-    # save Shortlist and Scaled Shortlist for App access
-    df_shortlist.to_csv('build/df_shortlist.csv', index=True, index_label='index')
-    df_shortlist_scaled.to_csv('build/df_shortlist_scaled.csv', index=True, index_label='index')
-
-    # create list of MLP designs (combinations of hidden layers) from (1,) to (10,10,10)
+def GetMLPDesigns():
     Designs = []
-    for a in range(2,11,2):
+    for a in range(2,5,2):
         Designs.append((a,))
 
-    for a in range(2,11,2):
-        for b in range(2,11,2):
+    for a in range(2,5,2):
+        for b in range(2,5,2):
             Designs.append((a,b))
 
-    for a in range(2,11,2):
-        for b in range(2,11,2):
-            for c in range(2,11,2):
+    for a in range(2,5,2):
+        for b in range(2,5,2):
+            for c in range(2,5,2):
                 Designs.append((a,b,c))
 
-    Probs = pd.DataFrame(Y_test, columns=['Event'], index=test_ids)
-    Probs['Weight'] = W_test
+    return Designs
+
+def TestMLPDesign(design, seed, X_train_scaled, W_train, Y_train, 
+                            X_test_scaled, W_test, Y_test):
+
     df_metrics = pd.DataFrame(index=['Accuracy','Precision','Recall','f1-score','S'])
+    df_pred = pd.DataFrame(columns=[str(design)+'prediction'])
 
-    # run  the loop to store results of different MLP configuratrions
-    for design in Designs:
-        MLP = MLPClassifier(hidden_layer_sizes = design,
-                            random_state = seed,
-                            shuffle=True,
-                            max_iter = 1000,        # def=200
-                            alpha=0.0001, #0.05,             # def=0.0001
-                            activation='relu',  # def=’relu’
-                            )
-        MLP.fit(X_train_scaled, Y_train)
-        sig_prob = MLP.predict_proba(X_test_scaled)[:, 1]
-        pred = MLP.predict(X_test_scaled)
+    #Define model
+    MLP = MLPClassifier(hidden_layer_sizes = design,
+                        random_state = seed,
+                        shuffle=True,
+                        max_iter = 1000,        # def=200
+                        alpha=0.0001, #0.05,             # def=0.0001
+                        activation='relu',  # def=’relu’
+                        )
+    #Train model
+    MLP.fit(X_train_scaled, Y_train) #, sample_weight=W_train)
 
-        Probs[str(design)]=sig_prob.round(2)
+    #Assess model
+    sig_prob = MLP.predict_proba(X_test_scaled)[:, 1]
+    pred = MLP.predict(X_test_scaled)
+    tn, fp, fn, tp = confusion_matrix(Y_test, pred, sample_weight=W_test).ravel()
+    S = tp/(fp**0.5)
 
-        tn, fp, fn, tp = confusion_matrix(Y_test, pred, sample_weight=W_test).ravel()
-        S = tp/(fp**0.5)
 
-        df_metrics[str(design)]=np.array([accuracy_score(Y_test, pred, sample_weight=W_test),
+    df_metrics[str(design)]=np.array([accuracy_score(Y_test, pred, sample_weight=W_test),
                                     precision_score(Y_test, pred, sample_weight=W_test),
                                     recall_score(Y_test, pred, sample_weight=W_test),
                                     f1_score(Y_test, pred, sample_weight=W_test),
                                     S/100
                                     ]).round(4)*100
 
-    df_probs = Probs.astype({'Weight':'float16'})
+    df_pred[str(design)+'prediction'] = sig_prob
+    return df_pred, df_metrics
 
-    # # save from Jupyter
+
+def Run():
+    
+    #Get data
+    df_app = get_data()
+
+    # split into train and test sets
+    df_train, df_test = balanced_count_split(df_app, random_seed=seed)
+
+    X_train, W_train, Y_train = InWeightOutSplit(df_train)
+    X_test, W_test, Y_test = InWeightOutSplit(df_test)
+    
+    # Initialise the Scaler
+    scaler = StandardScaler()
+    # Scale the sets
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
+    #Save useful data for app
+    df_test = df_test.reset_index()
+    save_app_test_data(df_test)
+    #form a shortlist df from the testing data to use with MLP visualisation
+    #df_shortlist = shortlist(df_test, random_seed=seed)
+
+
+    # create list of MLP designs (combinations of hidden layers) from (1,) to (10,10,10)
+    Designs = GetMLPDesigns()
+    Result_probs = []
+    Result_metrics = []
+
+    # run  the loop to store results of different MLP configuratrions
+    for design in Designs:
+
+        tmp_probs, tmp_metrics = TestMLPDesign(design, seed, X_train_scaled, W_train, Y_train, 
+                                                        X_test_scaled, W_test, Y_test)
+
+        Result_probs.append(tmp_probs)
+        Result_metrics.append(tmp_metrics)
+
+    df_probs = pd.concat(Result_probs, axis=1)#, join='inner')
+    df_probs['Event'] = df_test['Event']
+    df_probs = df_probs.reset_index()
+
+    df_shortlist = shortlist(df_probs, random_seed=seed)
+    df_probs_shortlist = df_probs.join(df_shortlist['index'], on=None, how='inner', lsuffix="_L", rsuffix="_R")
+
+    df_metrics = pd.concat(Result_metrics, axis=1)
+
     df_probs.to_csv('build/df_probs_2022.csv', index=True, index_label='index')
+    df_probs_shortlist.to_csv('build/df_probs_shortlist.csv', index=True, index_label='index')
     df_metrics.to_csv('build/df_metrics_2022.csv', index=True, index_label='index')
 
 if __name__ == "__main__":
-    import os.path
-    from pathlib import Path
 
     FilesExist = True	
-    idir = Path("build/")
     if not os.path.isdir("build"):
         idir.mkdir()
 
-    for ifile in ["df_2022", "df_test", "df_shortlist", "df_shortlist_scaled", "df_probs_2022", "df_metrics_2022"]:
+    for ifile in ["df_2022", "df_test", "df_probs_shortlist", "df_probs_2022", "df_metrics_2022"]:
         FilesExist = os.path.isfile("build/"+ifile+".csv")
         if not FilesExist:
             print("Regenerating files.")
