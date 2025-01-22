@@ -9,44 +9,80 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, confusion_matrix, ConfusionMatrixDisplay
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, train_test_split
 
 seed = 84
 
+# def balanced_count_split(df, random_seed, fr=0.7):
+#     df_train = pd.DataFrame(columns=df.keys())  # frame the training subset
+#     events = df['Event'].unique()               # list all events
+#     train_DM = df[df['Event']=='DM_300'].sample(frac=fr, random_state=random_seed)  # training part of DM subset
+#     train_DM_size = len(train_DM)  # size of training DM subset
+#     full_DM_size = len(df[df['Event']=='DM_300'])  # full size of training DM subset
+#     full_size = len(df)
+#     full_BKG_size = full_size - full_DM_size
+#     k=1
+#     for event in events:
+#         if event!=events[-1]:
+#             df_event = df[df['Event']==event]            # form the current Event subset
+
+#             full_Event_size = len(df[df['Event']==event])
+#             R = full_Event_size/full_BKG_size
+#             N = train_DM_size*R*4*k
+
+#             train_part = df_event.sample(n=int(N), random_state=random_seed)  # take a random sample
+#             df_train = pd.concat([df_train,train_part])   # append the training subset
+#     df_train = pd.concat([df_train,train_DM])
+
+#     # now split the rest of data into testing and background (with no DM) subsets
+#     df_rest = df.drop(df_train.index)              # rest = dataset - training subset
+#     df_test = pd.DataFrame(columns=df.keys())      # frame the 'testing' subset
+#     test_DM = df_rest[df_rest['Event']=='DM_300']  # extract all DM data to include in the testing subset
+#     test_DM_size = full_DM_size-train_DM_size
+#     for event in events:
+#         if event!=events[-1]:
+#             df_event = df_rest[df_rest['Event']==event]    # form the current Event subset
+#             full_Event_size = len(df[df['Event']==event])
+#             N = full_Event_size*(1-fr)
+#             test_part = df_event.sample(n=int(N), random_state=random_seed)  # take random sample
+#             df_test = pd.concat([df_test,test_part])      # append the background subset
+#     df_test = pd.concat([df_test,test_DM])
+
+#     return df_train, df_test
+
 def balanced_count_split(df, random_seed, fr=0.7):
-    df_train = pd.DataFrame(columns=df.keys())  # frame the training subset
+    
+    df_train = df_test = pd.DataFrame(columns=df.keys())  # frame the training subset
     events = df['Event'].unique()               # list all events
-    train_DM = df[df['Event']=='DM_300'].sample(frac=fr, random_state=random_seed)  # training part of DM subset
-    train_DM_size = len(train_DM)  # size of training DM subset
-    full_DM_size = len(df[df['Event']=='DM_300'])  # full size of training DM subset
-    full_size = len(df)
-    full_BKG_size = full_size - full_DM_size
-    k=1
-    for event in events:
-        if event!=events[-1]:
-            df_event = df[df['Event']==event]            # form the current Event subset
+    
+    df_DM = df[df['Event']=='DM_300']
+    df_bkg = df[df['Event']!='DM_300']
 
-            full_Event_size = len(df[df['Event']==event])
-            R = full_Event_size/full_BKG_size
-            N = train_DM_size*R*4*k
+    train_DM, test_DM = train_test_split(df_DM, train_size=fr, random_state=random_seed)
+    train_bkg, test_bkg = train_test_split(df_bkg, train_size=fr, random_state=random_seed, stratify=df_bkg['Event'])
 
-            train_part = df_event.sample(n=int(N), random_state=random_seed)  # take a random sample
-            df_train = pd.concat([df_train,train_part])   # append the training subset
-    df_train = pd.concat([df_train,train_DM])
+    # train_DM_size = len(train_DM)  # size of training DM subset
+    # full_DM_size = len(df[df['Event']=='DM_300'])  # full size of training DM subset
+    # full_size = len(df)
+    # full_BKG_size = full_size - full_DM_size
+    # k=1
 
-    # now split the rest of data into testing and background (with no DM) subsets
-    df_rest = df.drop(df_train.index)              # rest = dataset - training subset
-    df_test = pd.DataFrame(columns=df.keys())      # frame the 'testing' subset
-    test_DM = df_rest[df_rest['Event']=='DM_300']  # extract all DM data to include in the testing subset
-    test_DM_size = full_DM_size-train_DM_size
-    for event in events:
-        if event!=events[-1]:
-            df_event = df_rest[df_rest['Event']==event]    # form the current Event subset
-            full_Event_size = len(df[df['Event']==event])
-            N = full_Event_size*(1-fr)
-            test_part = df_event.sample(n=int(N), random_state=random_seed)  # take random sample
-            df_test = pd.concat([df_test,test_part])      # append the background subset
-    df_test = pd.concat([df_test,test_DM])
+    # for event in events:
+    #     if event!='DM_300':
+    #         df_event = df[df['Event']==event]            # form the current Event subset
+
+    #         full_Event_size = len(df[df['Event']==event])
+    #         R = 1/full_BKG_size
+    #         N_train = train_DM_size*R*4*k
+    #         N_test = (1-fr)
+
+    #         train_part, test_part = train_test_split(df_event, N_train, N_test, random_state=random_seed)
+
+    #         df_train = pd.concat([df_train,train_part])   # append the training subset
+    #         df_test = pd.concat([df_test,test_part])
+
+    df_train = pd.concat([train_bkg,train_DM])
+    df_test = pd.concat([test_bkg,test_DM])
 
     return df_train, df_test
 
