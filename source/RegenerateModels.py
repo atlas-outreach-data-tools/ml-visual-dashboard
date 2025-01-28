@@ -86,7 +86,7 @@ def shortlist(df_test, random_seed, N=3):
     for event in events:
         df_event = df_test[df_test['Event']==event]       # extract the current class data
         short_part = df_event.sample(n=N, random_state=random_seed)  # take a random sample of N size
-        tmp_shortlist.append(short_part[['index', 'Event']]) 
+        tmp_shortlist.append(short_part) 
 
     df_shortlist = pd.concat(tmp_shortlist)
 
@@ -100,31 +100,33 @@ def save_app_test_data(df_test):
     df_test00 = df_test.astype({'totalWeight':'float16'})
     df_test00 = df_test00.round({'lead_lep_pt': 1, 'sublead_lep_pt': 1, 'mll': 1, 'ETmiss': 1,'dRll': 2, 'dphi_pTll_ETmiss': 3,'fractional_pT_difference': 3, 'ETmiss_over_HT': 3,})
     # save Test data for visualising in Scatter plot in WebApp
-    df_test00.to_csv('build/scatter_data.csv', index=True, index_label='index')    
+    df_test00.to_csv('build/scatter_data.csv', index=False)#, index_label='index')    
 
 
 def GetMLPDesigns():
     Designs = []
-    for a in range(2,5,2):
+    for a in range(2,11,1):
         Designs.append((a,))
 
-    for a in range(2,5,2):
-        for b in range(2,5,2):
+    for a in range(2,11,1):
+        for b in range(2,11,1):
             Designs.append((a,b))
 
-    for a in range(2,5,2):
-        for b in range(2,5,2):
-            for c in range(2,5,2):
+    for a in range(2,11,1):
+        for b in range(2,11,1):
+            for c in range(2,11,1):
                 Designs.append((a,b,c))
 
     return Designs
 
 
 def TestMLPDesign(design, seed, X_train_scaled, W_train, Y_train, 
-                            X_test_scaled, W_test, Y_test):
+                            X_test_scaled, W_test, Y_test,
+                            shortlist_scaled):
 
     df_metrics = pd.DataFrame(index=['Accuracy','Precision','Recall','f1-score','S'])
-    df_pred = pd.DataFrame(columns=[str(design)+'prediction'])
+    df_pred = pd.DataFrame(columns=[str(design)])
+    shortlist_pred = pd.DataFrame(columns=[str(design)])
 
     #Define model
     MLP = MLPClassifier(hidden_layer_sizes = design,
@@ -151,15 +153,22 @@ def TestMLPDesign(design, seed, X_train_scaled, W_train, Y_train,
                                     S/100
                                     ]).round(4)*100
 
-    df_pred[str(design)+'prediction'] = sig_prob
-    return df_pred, df_metrics
+    df_pred[str(design)] = sig_prob
+    
+    #handle the shortlist with careful matching event-by-event of properties
+    tmp_shortlist = shortlist_scaled
+    tmp_shortlist.columns = tmp_shortlist.columns.astype(str)
+    tmp_shortlist = tmp_shortlist.drop(columns=["index"]).to_numpy()
+    shortlist_pred[str(design)] = MLP.predict_proba(tmp_shortlist)[:, 1]
+    #shortlist_pred["index"] = shortlist_scaled["index"]
+    return df_pred, df_metrics, shortlist_pred
 
 
 def Run():
     
     #Get data
     df_app = get_data()
-
+ 
     # split into train and test sets
     df_train, df_test = balanced_count_split(df_app, random_seed=seed)
 
@@ -174,35 +183,46 @@ def Run():
 
     #Save useful data for app
     df_test = df_test.reset_index()
+    X_test_scaled_tmp = pd.DataFrame(X_test_scaled).reset_index()
     save_app_test_data(df_test)
 
     # create list of MLP designs (combinations of hidden layers) from (1,) to (10,10,10)
     Designs = GetMLPDesigns()
     Result_probs = []
     Result_metrics = []
+    Shortlist_probs = []
+
+
+    #For memory-safe event-by-event information:
+    joined = pd.merge(df_test, X_test_scaled_tmp, on="index")
+    df_shortlist = shortlist(joined, random_seed=seed)
+    shortlist_scaled = df_shortlist.drop(columns=["Event","totalWeight","sum_lep_charge","lead_lep_pt",
+                                            "sublead_lep_pt","mll","ETmiss","dRll","dphi_pTll_ETmiss",
+                                            "fractional_pT_difference","ETmiss_over_HT"])
 
     # run  the loop to store results of different MLP configuratrions
     for design in Designs:
 
-        tmp_probs, tmp_metrics = TestMLPDesign(design, seed, X_train_scaled, W_train, Y_train, 
-                                                        X_test_scaled, W_test, Y_test)
+        tmp_probs, tmp_metrics, shortlist_pred = TestMLPDesign(design, seed, X_train_scaled, W_train, Y_train, 
+                                                        X_test_scaled, W_test, Y_test, shortlist_scaled)
 
         Result_probs.append(tmp_probs)
         Result_metrics.append(tmp_metrics)
+        Shortlist_probs.append(shortlist_pred)
 
     df_probs = pd.concat(Result_probs, axis=1)#, join='inner')
+    df_metrics = pd.concat(Result_metrics, axis=1)
     df_probs['Event'] = df_test['Event']
     df_probs['weight'] = W_test
     df_probs = df_probs.reset_index()
-
-    df_shortlist = shortlist(df_probs, random_seed=seed)
-    df_probs_shortlist = df_probs.join(df_shortlist['index'], on=None, how='inner', lsuffix="_L", rsuffix="_R")
-
-    df_metrics = pd.concat(Result_metrics, axis=1)
-
-    df_probs.to_csv('build/MLP_output.csv', index=True, index_label='index')
-    df_probs_shortlist.to_csv('build/events_shortlist_MLP.csv', index=True, index_label='index')
+    df_probs.to_csv('build/scatter_probs.csv', index=False)#, index_label='index')
     df_metrics.to_csv('build/MLP_metrics.csv', index=True, index_label='index')
+
+    df_probs_shortlist = pd.concat(Shortlist_probs, axis=1)
+    df_probs_shortlist = df_probs_shortlist.set_index(df_shortlist.index)
+    df_shortlist_tosave = pd.concat([df_shortlist, df_probs_shortlist], axis=1)
+    print(df_shortlist, df_probs_shortlist)
+    df_shortlist_tosave.to_csv('build/events_shortlist_MLP.csv', index=False)#, index_label='index')
 
 if __name__ == "__main__":
 
@@ -210,7 +230,7 @@ if __name__ == "__main__":
     if not os.path.isdir("build"):
         idir.mkdir()
 
-    for ifile in ["MLP_output", "events_shortlist_MLP", "MLP_metrics", "scatter_data", "df_2022"]:
+    for ifile in ["scatter_probs", "events_shortlist_MLP", "MLP_metrics", "scatter_data", "df_2022"]:
         FilesExist = os.path.isfile("build/"+ifile+".csv")
         if not FilesExist:
             print("Regenerating files.")

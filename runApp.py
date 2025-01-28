@@ -6,7 +6,7 @@ idir = Path("build/")
 if not os.path.isdir("build"):
     idir.mkdir()
 
-for ifile in ["MLP_output", "events_shortlist_MLP", "MLP_metrics", "scatter_data", "df_2022"]:
+for ifile in ["scatter_probs", "events_shortlist_MLP", "MLP_metrics", "scatter_data", "df_2022"]:
     FilesExist = os.path.isfile("build/"+ifile+".csv")
 
 if not FilesExist:
@@ -160,12 +160,12 @@ NN.layout = dbc.Container([
                                     style={'font-size':16, 'marginBottom':20, 'font-family':'ROG fonts', 'color':'Navy'}),
                         #html.Hr(),
                         daq.DarkThemeProvider(theme=UI_objects.dark_theme, children=NN_display.Data_Dropdown)], body=True),
-                dbc.Row([dbc.Col(dbc.Card([html.Center(dbc.Label('Scale data:',
+                dbc.Row([dbc.Col(dbc.Card([html.Center(dbc.Label('Power on:',
                                                      style={'font-size':16, 'marginBottom':20, 'font-family':'ROG fonts', 'color':'Navy'})),
                                           #html.Hr(),
-                                          daq.DarkThemeProvider(theme=UI_objects.dark_theme, children=NN_display.Scaler_Switch)], body=True)),
-                        dbc.Col(dbc.Card([html.Center(dbc.Label('Start NN:',
-                                                    style={'font-size':16, 'marginBottom':20, 'font-family':'ROG fonts', 'color':'Navy'})),
+                        #                   daq.DarkThemeProvider(theme=UI_objects.dark_theme, children=NN_display.Scaler_Switch)], body=True)),
+                        # dbc.Col(dbc.Card([html.Center(dbc.Label('Start NN:',
+                        #                             style={'font-size':16, 'marginBottom':20, 'font-family':'ROG fonts', 'color':'Navy'})),
                                           #html.Hr(),
                                           daq.DarkThemeProvider(theme=UI_objects.dark_theme, children=NN_display.Power_Button)], body=True))]),
                 ],

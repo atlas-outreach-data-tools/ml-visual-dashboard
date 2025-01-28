@@ -35,31 +35,10 @@ def update_legend(tab):
     return options
 
 
-@callback(Output('Scaler_Switch', 'label'),
-          Output('Scaler_Switch', 'disabled'),
-          Input('Scaler_Switch', 'on'),
-          Input('Data_Dropdown', 'value'))
-def update_switch(on, value):
-    if value is None:
-        state = True
-        label = dict(label='select event', style={'font-family':'Segoe Print', 'color':'grey'})
-    elif value is not None and on==True:
-        state = False
-        label=dict(label='scaled', style={'font-family':'Segoe Print', 'color':'#00EA64'})
-    else:
-        state = False
-        label=dict(label='NOT scaled', style={'font-family':'Segoe Print', 'color':'FireBrick'})
-    return label, state
-
-
-@callback(Output('Power_Button', 'disabled'),
-          Input('Data_Dropdown', 'value'))
-def power_button_state(value):
-    if value is None:
-        state = True
-    else:
-        state = False
-    return state
+@callback(Output('Power_Button', 'on'),
+          Input('Power_Button', 'on'))
+def power_button_state(on):
+    return on
 
 
 @callback(Output('HL1_Gauge', 'value'), 
@@ -121,14 +100,14 @@ def active_selectors(number):
           Output("Accuracy_LED", "color"), 
           Output("F1_LED", "value"),
           Output("F1_LED", "color"),          
-          Input('Scaler_Switch', 'on'),
+          #Input('Scaler_Switch', 'on'),
           Input('Power_Button', 'on'),
           Input("NN_Depth", "value"),
           Input("HL1_Selector", "value"),
           Input("HL2_Selector", "value"),
           Input("HL3_Selector", "value"),
           )
-def update_led_values(scaler, power, number_hl, HL1_size, HL2_size, HL3_size):
+def update_led_values(power, number_hl, HL1_size, HL2_size, HL3_size):
         
     Nhl = number_hl   # number of hidden layers (1 to 3)    
     hl1 = int(HL1_size) if HL1_size%2==0 else int(HL1_size+1)  # number of nods in the hidden layers
@@ -141,7 +120,7 @@ def update_led_values(scaler, power, number_hl, HL1_size, HL2_size, HL3_size):
         design = f'({hl1}, {hl2}, {hl3})'
 
     design = design
-    if scaler==True and power==True:
+    if power==True:
         accuracy = data_backend.df_metrics[design]['Accuracy'].round(2)
         f1_score = data_backend.df_metrics[design]['f1-score'].round(2)
         color = UI_objects.dark_theme['primary']
@@ -155,13 +134,13 @@ def update_led_values(scaler, power, number_hl, HL1_size, HL2_size, HL3_size):
           Output("Hist_Slider", "disabled"),
           Output("Hist_Slider", "color"),
           Output("Hist_Slider", "handleLabel"),
-          Input('Scaler_Switch', 'on'),
+          #Input('Scaler_Switch', 'on'),
           Input('Power_Button', 'on'),
           )
-def activate_hist_slider(scaler, power):
-    if scaler!=True or power!=True:
+def activate_hist_slider(power):
+    if power!=True:
         status=True
-        color='WHiteSmoke'
+        color='WhiteSmoke'
         handleLabel=dict(label='Cut', color='WhiteSmoke')
     else:
         status=False
@@ -173,7 +152,7 @@ def activate_hist_slider(scaler, power):
 @callback(
           Output("Signif_Hist", "children"),
           Output("Signif_Hist", "color"), 
-          Input('Scaler_Switch', 'on'),
+          #Input('Scaler_Switch', 'on'),
           Input('Power_Button', 'on'),
           Input("NN_Depth", "value"),
           Input("HL1_Selector", "value"),
@@ -181,7 +160,7 @@ def activate_hist_slider(scaler, power):
           Input("HL3_Selector", "value"),
           Input("Hist_Slider", "value"),
           )
-def update_signif_hist(scaler, power, number_hl, HL1_size, HL2_size, HL3_size, cut):
+def update_signif_hist(power, number_hl, HL1_size, HL2_size, HL3_size, cut):
         
     Nhl = number_hl             # number of hidden layers (1 to 3)    
     hl1 = int(HL1_size) if HL1_size%2==0 else int(HL1_size+1)  # number of nods in the hidden layers
@@ -193,16 +172,15 @@ def update_signif_hist(scaler, power, number_hl, HL1_size, HL2_size, HL3_size, c
     elif Nhl == 3:
         design = f'({hl1}, {hl2}, {hl3})'
 
-    design=design+"prediction"
     # make cut and calculate significance
     df = data_backend.df_probs[['Event','weight',design]]
     selection = df[df[design]>=cut]
 
-    W_sig = sum(selection[selection['Event']==1.0]['weight'])
+    W_sig = sum(selection[selection['Event']=="DM_300"]['weight'])
     W_bkg = sum(selection['weight']) - W_sig
     S = (W_sig/np.sqrt(W_bkg)).round(2)
 
-    if scaler==True and power==True:
+    if power==True:
         significance = S
         color = 'Green' #dark_theme['primary']
     else:
@@ -213,7 +191,7 @@ def update_signif_hist(scaler, power, number_hl, HL1_size, HL2_size, HL3_size, c
 
 @callback(
     Output("Legend_Hist", "options"),
-    Input('Scaler_Switch', 'on'),
+    #Input('Scaler_Switch', 'on'),
     Input('Power_Button', 'on'),
     Input("NN_Depth", "value"),
     Input("HL1_Selector", "value"),
@@ -221,7 +199,7 @@ def update_signif_hist(scaler, power, number_hl, HL1_size, HL2_size, HL3_size, c
     Input("HL3_Selector", "value"),
     Input("Hist_Slider", "value"),
     )
-def legend_hist_update(scaler, power, number_hl, HL1_size, HL2_size, HL3_size, cut):
+def legend_hist_update(power, number_hl, HL1_size, HL2_size, HL3_size, cut):
     
     Nhl = number_hl             # number of hidden layers (1 to 3)    
     hl1 = int(HL1_size) if HL1_size%2==0 else int(HL1_size+1)  # number of nods in the hidden layers
@@ -233,21 +211,21 @@ def legend_hist_update(scaler, power, number_hl, HL1_size, HL2_size, HL3_size, c
     elif Nhl == 3:
         design = f'({hl1}, {hl2}, {hl3})'
 
-    design=design+"prediction"
+    #design=design+"prediction"
     # make selection and calculate number of events (sum of weights)
     df = data_backend.df_probs[['Event','weight',design]]
     selection = df[df[design]>=cut]
 
-    now_sig = round(sum(selection[selection['Event']==1.0]['weight']), 1)
+    now_sig = round(sum(selection[selection['Event']=="DM_300"]['weight']), 1)
     now_bkg = round((sum(selection['weight']) - now_sig), 1)
-    full_sig = round(sum(df[df['Event']==1.0]['weight']), 1)
+    full_sig = round(sum(df[df['Event']=="DM_300"]['weight']), 1)
     full_bkg = round((sum(df['weight']) - full_sig), 1)
 
-    if scaler==True and power==True:
+    if power==True:
         status = False
-        now_sig = round(sum(selection[selection['Event']==1.0]['weight']), 1)
+        now_sig = round(sum(selection[selection['Event']=="DM_300"]['weight']), 1)
         now_bkg = round((sum(selection['weight']) - now_sig), 1)
-        full_sig = round(sum(df[df['Event']==1.0]['weight']), 1)
+        full_sig = round(sum(df[df['Event']=="DM_300"]['weight']), 1)
         full_bkg = round((sum(df['weight']) - full_sig), 1)
     else:
         status = True
@@ -376,14 +354,14 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
 @callback(
           Output("MLP", "figure"), 
           Input('Data_Dropdown', 'value'),
-          Input('Scaler_Switch', 'on'),
+          #Input('Scaler_Switch', 'on'),
           Input('Power_Button', 'on'),
           Input("NN_Depth", "value"),
           Input("HL1_Selector", "value"),
           Input("HL2_Selector", "value"),
           Input("HL3_Selector", "value"),
           )
-def update_MLP(id, scaled, power, number_hl, HL1_size, HL2_size, HL3_size): 
+def update_MLP(id, power, number_hl, HL1_size, HL2_size, HL3_size): 
     
     ### Inputs 
     f=len(UI_objects.Features)      # number of input features
@@ -489,10 +467,8 @@ def update_MLP(id, scaled, power, number_hl, HL1_size, HL2_size, HL3_size):
     Color_off = ['WhiteSmoke' for color in Color_on[:-(o+1)]]+(o+1)*['White']
     Color_red = ['MistyRose' for color in Color_on[:-(o+1)]]+(o+1)*['White']
 
-    if power == True and scaled == True:
+    if power == True:
         Color = Color_on
-    elif power == True and scaled == False:
-        Color = Color_red  
     else:
         Color = Color_off
 
@@ -535,19 +511,20 @@ def update_MLP(id, scaled, power, number_hl, HL1_size, HL2_size, HL3_size):
 
 
     # custom input nodes
-    if id is not None and scaled==True:
-        event = data_backend.df_scatter.iloc[id, :]
+    if id is not None:
+        event = data_backend.df_shortlist.loc[id, :]
         color_input="ForestGreen"       
-    elif id is not None and scaled==False:
-        event = data_backend.df_scatter.iloc[id, :].drop(columns=['Event','totalWeight']).loc[id]
-        color_input='FireBrick'           
+    # elif id is not None and scaled==False:
+    #     event = data_backend.df_scatter.iloc[id, :].drop(columns=['Event','totalWeight']).loc[id]
+    #     color_input='FireBrick'           
     else:
-        event = data_backend.df_scatter.iloc[0, :]
+        event = data_backend.df_shortlist.iloc[0, :]
         color_input='WhiteSmoke'  # hides figures to imitate empty input
 
-    for i in range(f):  
-        val = event.iloc[-i+(f-1)]
-        label = UI_objects.Features[-i+(f-1)]
+    for i in range(f):
+        feature = UI_objects.Features[i]
+        val = str(round(float(event[feature]), 2))
+        label = feature
         # input nodes shapes and values
         MLP.add_shape(type="rect",
                       xref="paper", yref="paper",
@@ -573,8 +550,8 @@ def update_MLP(id, scaled, power, number_hl, HL1_size, HL2_size, HL3_size):
                   )    
       
     # custom output nodes
-    if id is not None and scaled==True and power==True:
-        sig_prob = data_backend.df_probs[design+"prediction"][id]
+    if id is not None and power==True:
+        sig_prob = data_backend.df_shortlist[design][id].round(2)
         bkg_prob = (1-sig_prob).round(2)
         if sig_prob>=0.5:
             Sig_Color="Bisque"
@@ -586,7 +563,7 @@ def update_MLP(id, scaled, power, number_hl, HL1_size, HL2_size, HL3_size):
             Bkg_Color='PaleTurquoise'
             Sig_Size=12
             Bkg_Size=16
-        true_label=data_backend.df_probs['Event'][id]
+        true_label=data_backend.df_shortlist['Event'][id]
         if (sig_prob>=0.5 and true_label==1) or (sig_prob<0.5 and true_label==0):
             Text_Color='ForestGreen'
         else:
@@ -697,7 +674,7 @@ def update_MLP(id, scaled, power, number_hl, HL1_size, HL2_size, HL3_size):
 
 @callback(
           Output("Hist", "figure"), 
-          Input('Scaler_Switch', 'on'),
+          #Input('Scaler_Switch', 'on'),
           Input('Power_Button', 'on'),
           Input("NN_Depth", "value"),
           Input("HL1_Selector", "value"),
@@ -706,7 +683,7 @@ def update_MLP(id, scaled, power, number_hl, HL1_size, HL2_size, HL3_size):
           Input('Hist_Slider', 'value'),
           Input("Legend_Hist", "value"),
           )
-def update_hist(scaled, power, number_hl, HL1_size, HL2_size, HL3_size, cut, events): 
+def update_hist(power, number_hl, HL1_size, HL2_size, HL3_size, cut, events): 
     
     Nhl = number_hl             # number of hidden layers (1 to 3)    
     hl1 = int(HL1_size) if HL1_size%2==0 else int(HL1_size+1)  # number of nods in the hidden layers
@@ -719,11 +696,11 @@ def update_hist(scaled, power, number_hl, HL1_size, HL2_size, HL3_size, cut, eve
         design = f'({hl1}, {hl2}, {hl3})'
 
 
-    if scaled==True and power==True:
+    if power==True:
         df_on = data_backend.df_probs.copy()
         df_on["Event"] = (df_on["Event"]=="DM_300").astype(int)
         df_on = df_on[df_on["Event"].isin(events)]
-        X = df_on[design+"prediction"]
+        X = df_on[design]
         Color=['Signal' if i==1 else 'Background' for i in df_on['Event']]
         Title='Output of the Neural Network'
         Y=df_on['weight']
@@ -766,15 +743,6 @@ def update_hist(scaled, power, number_hl, HL1_size, HL2_size, HL3_size, cut, eve
                        xbins=dict(size=0.05, start=0.0, end=1.0),
                        )
     
-    # hist.for_each_trace(
-    #                     # lambda trace: trace.update(marker=dict(line=dict(color='Orange', width=0),
-    #                     #                                        pattern=dict(shape='', fgopacity=0.5, ))) if trace.name == 'Signal' 
-    #                     # else trace.update(marker=dict(
-    #                     #                               line=dict(color='steelblue', width=0),
-    #                     #                               pattern=dict(shape='', fgopacity=0.5, fillmode='overlay'))),
-    #                     lambda trace: [trace.update(marker=dict(opacity=0.1,
-    #                                                pattern=dict(fgopacity=0.5, ))) for x in trace.x if x<cut],   
-    #                     )
     
     hist.update_xaxes(tick0=0., dtick=0.1,
                       range=[-0.05,1.05],

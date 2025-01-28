@@ -109,11 +109,11 @@ class NNDisplay:
                                 style={'font-family':'Coustard Black', 'font-size':10, 'color':'SlateGrey'}
                                 )
 
-        self.Scaler_Switch = daq.BooleanSwitch(id='Scaler_Switch',
-                                  on=False, 
-                                  labelPosition="bottom",
-                                  #vertical=True, #persistence=True 
-                                  )
+        # self.Scaler_Switch = daq.BooleanSwitch(id='Scaler_Switch',
+        #                           on=False, 
+        #                           labelPosition="bottom",
+        #                           #vertical=True, #persistence=True 
+        #                           )
 
         self.Power_Button = daq.PowerButton(id='Power_Button',
                                     on=False,
@@ -193,6 +193,5 @@ class DataBackend:
     def __init__(self):
         self.df_scatter = pd.read_csv('build/scatter_data.csv',index_col='index').drop_duplicates()
         self.df_shortlist = pd.read_csv('build/events_shortlist_MLP.csv',index_col='index').drop_duplicates()
-        #self.df_shortlist_scaled = pd.read_csv('build/df_shortlist_scaled.csv',index_col='index').drop_duplicates()
-        self.df_probs = pd.read_csv('build/MLP_output.csv',index_col='index').drop_duplicates()
         self.df_metrics = pd.read_csv('build/MLP_metrics.csv',index_col='index').drop_duplicates()
+        self.df_probs = pd.read_csv('build/scatter_probs.csv',index_col='index')
