@@ -2,7 +2,7 @@
 import random
 import numpy as np
 import pandas as pd
-import os.path
+import os
 
 # ML inventory
 from sklearn.preprocessing import StandardScaler
@@ -13,6 +13,7 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_sc
 from sklearn.model_selection import GridSearchCV, train_test_split
 
 seed = 84
+random_seed = 84
 
 def get_data():
 
@@ -79,13 +80,17 @@ def InWeightOutSplit(df):
 
     return X_train, W_train, Y_train
 
-def shortlist(df_test, random_seed, N=3):
+def shortlist(df_in, random_seed, N=3):
     #df_shortlist = pd.DataFrame(columns=df_test.keys())  # frame the subset
-    events = df_test['Event'].unique()                   # list all events
+    events = df_in['Event'].unique()                 # list all events
     tmp_shortlist = []
     for event in events:
-        df_event = df_test[df_test['Event']==event]       # extract the current class data
-        short_part = df_event.sample(n=N, random_state=random_seed)  # take a random sample of N size
+        df_test = df_in[df_in['Event']==event]
+        if event == "DM_300":
+            print(df_test)
+            df_test = df_test[df_test["(5, 5)"]>0.5]
+        # extract the current class data
+        short_part = df_test.sample(n=N, random_state=random_seed)  # take a random sample of N size
         tmp_shortlist.append(short_part) 
 
     df_shortlist = pd.concat(tmp_shortlist)
@@ -163,6 +168,25 @@ def TestMLPDesign(design, seed, X_train_scaled, W_train, Y_train,
     #shortlist_pred["index"] = shortlist_scaled["index"]
     return df_pred, df_metrics, shortlist_pred
 
+def saveHistograms(df_probs):
+    df_probs_sig = df_probs[df_probs["Event"]=="DM_300"]
+    df_probs_bkg = df_probs[df_probs["Event"]!="DM_300"]
+
+    Designs = GetMLPDesigns()
+    hists = {}
+    hists["binCentres"] = np.arange (0, 1.00, 0.05)+0.025
+
+    for design in Designs:
+        tmp_sig = np.histogram(df_probs_sig[str(design)], bins=np.arange(0, 1.05, 0.05), weights=df_probs_sig["weight"])
+        tmp_bkg = np.histogram(df_probs_bkg[str(design)], bins=np.arange(0, 1.05, 0.05), weights=df_probs_bkg["weight"])
+        plt.close()
+
+        hists[str(design)+"sig"] = tmp_sig[0]
+        hists[str(design)+"bkg"] = tmp_bkg[0]
+        
+    hists_df = pd.DataFrame(data=hists)
+    hists_df.to_csv("build/probsHists.csv", index=False)
+
 
 def Run():
     
@@ -194,9 +218,8 @@ def Run():
 
 
     #For memory-safe event-by-event information:
-    joined = pd.merge(df_test, X_test_scaled_tmp, on="index")
-    df_shortlist = shortlist(joined, random_seed=seed)
-    shortlist_scaled = df_shortlist.drop(columns=["Event","totalWeight","sum_lep_charge","lead_lep_pt",
+    df_shortlist = pd.merge(df_test, X_test_scaled_tmp, on="index")
+    shortlist_scaled = df_shortlist.drop(columns=[ "Event","totalWeight","sum_lep_charge","lead_lep_pt",
                                             "sublead_lep_pt","mll","ETmiss","dRll","dphi_pTll_ETmiss",
                                             "fractional_pT_difference","ETmiss_over_HT"])
 
@@ -215,14 +238,12 @@ def Run():
     df_probs['Event'] = df_test['Event']
     df_probs['weight'] = W_test
     df_probs = df_probs.reset_index()
-    df_probs.to_csv('build/scatter_probs.csv', index=False)#, index_label='index')
+    saveHistograms(df_probs)
     df_metrics.to_csv('build/MLP_metrics.csv', index=True, index_label='index')
 
-    df_probs_shortlist = pd.concat(Shortlist_probs, axis=1)
-    df_probs_shortlist = df_probs_shortlist.set_index(df_shortlist.index)
-    df_shortlist_tosave = pd.concat([df_shortlist, df_probs_shortlist], axis=1)
-    print(df_shortlist, df_probs_shortlist)
-    df_shortlist_tosave.to_csv('build/events_shortlist_MLP.csv', index=False)#, index_label='index')
+    df_probs_shortlist = shortlist(df_probs, random_seed=seed)
+    df_probs_shortlist = df_probs_shortlist.join(df_test, how='inner', rsuffix="_r")
+    df_probs_shortlist.to_csv('build/events_shortlist_MLP.csv', index=False)
 
 if __name__ == "__main__":
 
@@ -230,7 +251,7 @@ if __name__ == "__main__":
     if not os.path.isdir("build"):
         idir.mkdir()
 
-    for ifile in ["scatter_probs", "events_shortlist_MLP", "MLP_metrics", "scatter_data", "df_2022"]:
+    for ifile in ["events_shortlist_MLP", "MLP_metrics", "scatter_data", "probsHists"]:
         FilesExist = os.path.isfile("build/"+ifile+".csv")
         if not FilesExist:
             print("Regenerating files.")

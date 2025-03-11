@@ -194,4 +194,4 @@ class DataBackend:
         self.df_scatter = pd.read_csv('build/scatter_data.csv',index_col='index').drop_duplicates()
         self.df_shortlist = pd.read_csv('build/events_shortlist_MLP.csv',index_col='index').drop_duplicates()
         self.df_metrics = pd.read_csv('build/MLP_metrics.csv',index_col='index').drop_duplicates()
-        self.df_probs = pd.read_csv('build/scatter_probs.csv',index_col='index')
+        self.probsHists = pd.read_csv('build/probsHists.csv')

@@ -173,11 +173,15 @@ def update_signif_hist(power, number_hl, HL1_size, HL2_size, HL3_size, cut):
         design = f'({hl1}, {hl2}, {hl3})'
 
     # make cut and calculate significance
-    df = data_backend.df_probs[['Event','weight',design]]
-    selection = df[df[design]>=cut]
 
-    W_sig = sum(selection[selection['Event']=="DM_300"]['weight'])
-    W_bkg = sum(selection['weight']) - W_sig
+    binCentres = data_backend.probsHists["binCentres"]
+    selection = binCentres>=cut
+    signals = data_backend.probsHists[design+"sig"][selection]
+    backgrounds = data_backend.probsHists[design+"bkg"][selection]
+
+
+    W_sig = sum(signals)
+    W_bkg = sum(backgrounds)
     S = (W_sig/np.sqrt(W_bkg)).round(2)
 
     if power==True:
@@ -213,7 +217,7 @@ def legend_hist_update(power, number_hl, HL1_size, HL2_size, HL3_size, cut):
 
     #design=design+"prediction"
     # make selection and calculate number of events (sum of weights)
-    df = data_backend.df_probs[['Event','weight',design]]
+    df = data_backend.df_scatter[['Event','weight',design]]
     selection = df[df[design]>=cut]
 
     now_sig = round(sum(selection[selection['Event']=="DM_300"]['weight']), 1)
@@ -523,6 +527,7 @@ def update_MLP(id, power, number_hl, HL1_size, HL2_size, HL3_size):
 
     for i in range(f):
         feature = UI_objects.Features[i]
+        ##EVENT HHERE NOT COMPLETE --> FIX!!!!!
         val = str(round(float(event[feature]), 2))
         label = feature
         # input nodes shapes and values
@@ -697,13 +702,24 @@ def update_hist(power, number_hl, HL1_size, HL2_size, HL3_size, cut, events):
 
 
     if power==True:
-        df_on = data_backend.df_probs.copy()
-        df_on["Event"] = (df_on["Event"]=="DM_300").astype(int)
-        df_on = df_on[df_on["Event"].isin(events)]
-        X = df_on[design]
-        Color=['Signal' if i==1 else 'Background' for i in df_on['Event']]
+        
+        probs = data_backend.probsHists
+        X = np.arange(0, 1.0, 0.05)+0.025
+        Color = ['Background', 'Signal']
         Title='Output of the Neural Network'
-        Y=df_on['weight']
+
+        # Plot histogram as a bar
+        hist = px.bar( probs, x=X, y=[design+"bkg", design+"sig", ],    #data_frame=df,                    
+                            #labels={'color': 'Event', f'{0.}':'Background', 1.:'Signal'},
+                            color_discrete_sequence=['SteelBlue', 'Orange'],                        
+                            template = 'simple_white',
+                            log_y=True,
+                            barmode='overlay',                                                                
+                            )
+
+        hist.update_traces(#lambda trace: trace.update(marker=dict(line=dict(color='Orange', width=0),
+                           #                             pattern=dict(shape='', fgopacity=0.5, ))) if X <= cut else (),
+                            width=0.05)
 
     else:
         df = pd.DataFrame({'Event':np.array([0.]*50+[1.]*50),'v':np.array([0.02]*50+[0.98]*50),'w':np.array([1]*100)})
@@ -714,14 +730,28 @@ def update_hist(power, number_hl, HL1_size, HL2_size, HL3_size, cut, events):
         Y=df_on['w']
 
 
-    # plot the histogram
-    hist = px.histogram( x=X, y=Y, color=Color,    #data_frame=df,                    
-                        #labels={'color': 'Event', f'{0.}':'Background', 1.:'Signal'},
-                        color_discrete_map={'Background':'SteelBlue','Signal':'Orange'},                        
-                        template = 'simple_white',
-                        log_y=True,
-                        barmode='overlay',                                                                
-                        )
+      # plot the histogram
+        hist = px.histogram( x=X, y=Y, color=Color,    #data_frame=df,                    
+                            #labels={'color': 'Event', f'{0.}':'Background', 1.:'Signal'},
+                            color_discrete_map={'Background':'SteelBlue','Signal':'Orange'},                        
+                            template = 'simple_white',
+                            log_y=True,
+                            barmode='overlay',                                                                
+                            )
+
+        hist.update_traces( #lambda trace: trace.update(marker=dict(line=dict(color='Orange', width=0),
+                            #                                     pattern=dict(shape='', fgopacity=0.5, ))) if X <= cut else (),
+                       xbins=dict(size=0.05, start=0.0, end=1.0),
+                       )
+
+    # cut line            
+    hist.add_vline(x=cut, line_width=2, 
+                   line_dash="dash", line_color="Maroon",
+                   opacity=.8)
+
+    hist.update_xaxes(tick0=0., dtick=0.1,
+                      range=[-0.05,1.05],
+                      fixedrange=True)
    
     # control layout
     hist.update_layout(
@@ -736,21 +766,5 @@ def update_hist(power, number_hl, HL1_size, HL2_size, HL3_size, cut, events):
                         showlegend=False,
                         hovermode=False
                         )
-    
-    hist.update_traces(
-                      #  lambda trace: trace.update(marker=dict(line=dict(color='Orange', width=0),
-                      #                                           pattern=dict(shape='', fgopacity=0.5, ))) if X <= cut else (),
-                       xbins=dict(size=0.05, start=0.0, end=1.0),
-                       )
-    
-    
-    hist.update_xaxes(tick0=0., dtick=0.1,
-                      range=[-0.05,1.05],
-                      fixedrange=True)
-    
-    # cut line            
-    hist.add_vline(x=cut, line_width=2, 
-                   line_dash="dash", line_color="Maroon",
-                   opacity=.8)
    
     return hist
