@@ -217,20 +217,22 @@ def legend_hist_update(power, number_hl, HL1_size, HL2_size, HL3_size, cut):
 
     #design=design+"prediction"
     # make selection and calculate number of events (sum of weights)
-    df = data_backend.df_scatter[['Event','weight',design]]
-    selection = df[df[design]>=cut]
+    binCentres = data_backend.probsHists["binCentres"]
+    selection = binCentres>=cut
+    signals = data_backend.probsHists[design+"sig"]
+    backgrounds = data_backend.probsHists[design+"bkg"]
 
-    now_sig = round(sum(selection[selection['Event']=="DM_300"]['weight']), 1)
-    now_bkg = round((sum(selection['weight']) - now_sig), 1)
-    full_sig = round(sum(df[df['Event']=="DM_300"]['weight']), 1)
-    full_bkg = round((sum(df['weight']) - full_sig), 1)
+    now_sig = round(sum(signals[selection]), 1)
+    now_bkg = round(sum(backgrounds[selection]), 1)
+    full_sig = round(sum(signals), 1)
+    full_bkg = round(sum(backgrounds), 1)
 
     if power==True:
         status = False
-        now_sig = round(sum(selection[selection['Event']=="DM_300"]['weight']), 1)
-        now_bkg = round((sum(selection['weight']) - now_sig), 1)
-        full_sig = round(sum(df[df['Event']=="DM_300"]['weight']), 1)
-        full_bkg = round((sum(df['weight']) - full_sig), 1)
+        now_sig = round(sum(signals[selection]), 1)
+        now_bkg = round(sum(backgrounds[selection]), 1)
+        full_sig = round(sum(signals), 1)
+        full_bkg = round(sum(backgrounds), 1)
     else:
         status = True
         now_sig = now_bkg = full_sig = full_bkg = 50
