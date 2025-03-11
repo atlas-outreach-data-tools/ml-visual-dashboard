@@ -5,9 +5,10 @@ Priority to-dos:
 -----
 1) Edit code to stop producing deprecation warnings --> future proofing :: Done
 1.5) Make code more readable --> facilitate edits :: Done
-2) Edit RegenerationScript.py to be more efficient :: Started but need to check
+2) Edit RegenerationScript.py to be more efficient :: Done
+2.5) New thing to fix --> UI issue with histogram cut line not refreshing immediately
 3) Explicit notation of Python module requirements and dependencies :: Done
-4) Physics robustness checks
+4) Physics robustness checks --> now PRIORITY
 5) Tidy visual display :: Started. Inact the following:
 	a) Formal header and footer
 	b) Licensing information
