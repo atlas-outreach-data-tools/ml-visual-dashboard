@@ -227,7 +227,9 @@ NN.layout = dbc.Container([
 
     ## Insert description on how to use ML outputs 
     dbc.Row([dbc.Col([
-                    dbc.Col(dcc.Graph(id="Hist", config={'displayModeBar':False}),
+                    dbc.Col(dcc.Graph(id="Hist", config={'displayModeBar':False, 
+                                                        'edits':{'shapePosition':True}
+                                                        }),
                             ),
                     html.Br(),
                     dbc.Col(UI_objects.Hist_Slider, 

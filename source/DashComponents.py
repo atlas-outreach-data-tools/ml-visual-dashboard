@@ -56,7 +56,12 @@ def update_gauge2(value):
 @callback(Output('HL3_Gauge', 'value'), Input('HL3_Selector', 'value'))
 def update_gauge3(value):
     return value
+    
 
+@callback(Output('Hist_Slider', 'value'), 
+          Input('Hist_Slider', 'value'))
+def update_histSlider(value):
+    return value
 
 # control state of the selectors
 @callback(Output("HL2_Gauge", "disabled"),
@@ -273,7 +278,7 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
         Title = "Events in simulated data"        
     elif active_tab == "tab-1":
         Title = "Events in 'real' data"
-        #Color_counts = 'Whitedf        Pallete = {'Non-resonant_ll':'DimGray', 'Z+jets':'DimGray', 'WZ':'DimGray', 'ZZ':'DimGray', 'DM_300':'DimGray'}
+        Pallete = {'Non-resonant_ll':'DimGray', 'Z+jets':'DimGray', 'WZ':'DimGray', 'ZZ':'DimGray', 'DM_300':'DimGray'}
         Hover = False
         #Hover_data = {'Event':False, featX:True, featY:True}
 
@@ -314,45 +319,45 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
                               },
                       )
     
+    if active_tab == "tab-0":
+        # define significance through MC weights
+        W_sig = sum(df_filt[df_filt['Event']=='DM_300']['totalWeight'])
+        W_bkg = sum(df_filt['totalWeight']) - W_sig
+        S = (W_sig/np.sqrt(W_bkg)).round(2)
 
-    # define significance through MC weights
-    W_sig = sum(df_filt[df_filt['Event']=='DM_300']['totalWeight'])
-    W_bkg = sum(df_filt['totalWeight']) - W_sig
-    S = (W_sig/np.sqrt(W_bkg)).round(2)
-
-    # significance score - header
-    fig.add_shape(type="rect", xref="paper", yref="paper",
-                  fillcolor="White", line_color="White", line_width=0.25,
-                  x0=1.08-0.04, x1=1.27-0.04, y0=0.3-0.035, y1=0.3+0.035,    
-                  label=dict(text='Significance:', textposition='middle right', font_size=16, font_family='Coustard Black', font_color='DimGrey'),
-                  ) 
-    # significance score - box and value
-    fig.add_shape(type="rect", xref="paper", yref="paper",
-                  fillcolor="White", line_color="White", line_width=0.25,
-                  x0=1.08-0.04, x1=1.27-0.04, y0=0.2-0.035, y1=0.2+0.035,                  
-                  label=dict(text=S, textposition='middle right', font_size=18, font_family='Coustard Black', font_color='SeaGreen') #00EA64')
-                  ) 
-
-    # counts - header
-    fig.add_shape(type="rect", xref="paper", yref="paper",
-                  fillcolor="White", line_color="White", line_width=0.25,
-                  x0=1.08-0.04, x1=1.27-0.04, y0=0.94-0.035, y1=0.94+0.035,    
-                  label=dict(text='Events:', textposition='middle right', font_size=16, font_family='Coustard Black', font_color='DimGrey'),
-                  ) 
-    # counts of events
-    for z,event in enumerate(UI_objects.Events_sim):
-        now = round(sum(df_filt[df_filt['Event']==event]['totalWeight']),1)
-        full = round(sum(df[df['Event']==event]['totalWeight']),1)
+        # significance score - header
         fig.add_shape(type="rect", xref="paper", yref="paper",
                       fillcolor="White", line_color="White", line_width=0.25,
-                      x0=1.08-0.04, x1=1.17-0.04, y0=0.88-0.074*(z+1)-0.03, y1=0.88-0.074*(z+1)+0.03,                  
-                      label=dict(text=f'{now}', textposition='middle right', font_size=13, font_color='SteelBlue', font_family='Coustard Black',) 
-                      )
+                      x0=1.08-0.04, x1=1.27-0.04, y0=0.3-0.035, y1=0.3+0.035,    
+                      label=dict(text='Significance:', textposition='middle right', font_size=16, font_family='Coustard Black', font_color='DimGrey'),
+                      ) 
+        # significance score - box and value
         fig.add_shape(type="rect", xref="paper", yref="paper",
                       fillcolor="White", line_color="White", line_width=0.25,
-                      x0=1.17-0.04, x1=1.27-0.04, y0=0.88-0.074*(z+1)-0.03, y1=0.88-0.074*(z+1)+0.03,                  
-                      label=dict(text=f'({full})', textposition='middle left', font_size=13, font_color='SteelBlue', font_family='Coustard',) 
-                      )      
+                      x0=1.08-0.04, x1=1.27-0.04, y0=0.2-0.035, y1=0.2+0.035,                  
+                      label=dict(text=S, textposition='middle right', font_size=18, font_family='Coustard Black', font_color='SeaGreen') #00EA64')
+                      ) 
+
+        # counts - header
+        fig.add_shape(type="rect", xref="paper", yref="paper",
+                      fillcolor="White", line_color="White", line_width=0.25,
+                      x0=1.08-0.04, x1=1.27-0.04, y0=0.94-0.035, y1=0.94+0.035,    
+                      label=dict(text='Events:', textposition='middle right', font_size=16, font_family='Coustard Black', font_color='DimGrey'),
+                      ) 
+        # counts of events
+        for z,event in enumerate(UI_objects.Events_sim):
+            now = round(sum(df_filt[df_filt['Event']==event]['totalWeight']),1)
+            full = round(sum(df[df['Event']==event]['totalWeight']),1)
+            fig.add_shape(type="rect", xref="paper", yref="paper",
+                          fillcolor="White", line_color="White", line_width=0.25,
+                          x0=1.08-0.04, x1=1.17-0.04, y0=0.88-0.074*(z+1)-0.03, y1=0.88-0.074*(z+1)+0.03,                  
+                          label=dict(text=f'{now}', textposition='middle right', font_size=13, font_color='SteelBlue', font_family='Coustard Black',) 
+                          )
+            fig.add_shape(type="rect", xref="paper", yref="paper",
+                          fillcolor="White", line_color="White", line_width=0.25,
+                          x0=1.17-0.04, x1=1.27-0.04, y0=0.88-0.074*(z+1)-0.03, y1=0.88-0.074*(z+1)+0.03,                  
+                          label=dict(text=f'({full})', textposition='middle left', font_size=13, font_color='SteelBlue', font_family='Coustard',) 
+                          )      
     
     return fig
 
@@ -360,7 +365,6 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
 @callback(
           Output("MLP", "figure"), 
           Input('Data_Dropdown', 'value'),
-          #Input('Scaler_Switch', 'on'),
           Input('Power_Button', 'on'),
           Input("NN_Depth", "value"),
           Input("HL1_Selector", "value"),
@@ -678,19 +682,17 @@ def update_MLP(id, power, number_hl, HL1_size, HL2_size, HL3_size):
 
     return MLP
 
-
 @callback(
-          Output("Hist", "figure"), 
-          #Input('Scaler_Switch', 'on'),
+          Output('Hist', 'figure'), 
+          Input('Hist_Slider', 'value'),
           Input('Power_Button', 'on'),
-          Input("NN_Depth", "value"),
+          Input('NN_Depth', 'value'),
           Input("HL1_Selector", "value"),
           Input("HL2_Selector", "value"),
           Input("HL3_Selector", "value"),
-          Input('Hist_Slider', 'value'),
           Input("Legend_Hist", "value"),
           )
-def update_hist(power, number_hl, HL1_size, HL2_size, HL3_size, cut, events): 
+def update_hist(cut, power, number_hl, HL1_size, HL2_size, HL3_size, events): 
     
     Nhl = number_hl             # number of hidden layers (1 to 3)    
     hl1 = int(HL1_size) if HL1_size%2==0 else int(HL1_size+1)  # number of nods in the hidden layers
@@ -702,7 +704,18 @@ def update_hist(power, number_hl, HL1_size, HL2_size, HL3_size, cut, events):
     elif Nhl == 3:
         design = f'({hl1}, {hl2}, {hl3})'
 
-
+    cutline_val = cut
+    hist = None
+    
+    eventList = []
+    color_discrete_sequence = []
+    if 0 in events:
+        eventList.append(design+"bkg")
+        color_discrete_sequence.append("SteelBlue")
+    if 1 in events:
+        eventList.append(design+"sig")
+        color_discrete_sequence.append("Orange")
+    
     if power==True:
         
         probs = data_backend.probsHists
@@ -711,17 +724,16 @@ def update_hist(power, number_hl, HL1_size, HL2_size, HL3_size, cut, events):
         Title='Output of the Neural Network'
 
         # Plot histogram as a bar
-        hist = px.bar( probs, x=X, y=[design+"bkg", design+"sig", ],    #data_frame=df,                    
+        hist = px.bar( probs, x=X, y=eventList, #[design+"bkg", design+"sig", ],    #data_frame=df,                    
                             #labels={'color': 'Event', f'{0.}':'Background', 1.:'Signal'},
-                            color_discrete_sequence=['SteelBlue', 'Orange'],                        
+                            color_discrete_sequence=color_discrete_sequence, #['SteelBlue', 'Orange'],                        
                             template = 'simple_white',
                             log_y=True,
                             barmode='overlay',                                                                
-                            )
-
-        hist.update_traces(#lambda trace: trace.update(marker=dict(line=dict(color='Orange', width=0),
-                           #                             pattern=dict(shape='', fgopacity=0.5, ))) if X <= cut else (),
-                            width=0.05)
+                            ).add_vline(x=cutline_val, line_width=2, 
+                  line_dash="dash", line_color="Maroon",
+                  opacity=.8)
+        hist.update_traces(width=0.05)
 
     else:
         df = pd.DataFrame({'Event':np.array([0.]*50+[1.]*50),'v':np.array([0.02]*50+[0.98]*50),'w':np.array([1]*100)})
@@ -740,16 +752,7 @@ def update_hist(power, number_hl, HL1_size, HL2_size, HL3_size, cut, events):
                             log_y=True,
                             barmode='overlay',                                                                
                             )
-
-        hist.update_traces( #lambda trace: trace.update(marker=dict(line=dict(color='Orange', width=0),
-                            #                                     pattern=dict(shape='', fgopacity=0.5, ))) if X <= cut else (),
-                       xbins=dict(size=0.05, start=0.0, end=1.0),
-                       )
-
-    # cut line            
-    hist.add_vline(x=cut, line_width=2, 
-                   line_dash="dash", line_color="Maroon",
-                   opacity=.8)
+        hist.update_traces(xbins=dict(size=0.05, start=0.0, end=1.0))
 
     hist.update_xaxes(tick0=0., dtick=0.1,
                       range=[-0.05,1.05],
@@ -764,9 +767,10 @@ def update_hist(power, number_hl, HL1_size, HL2_size, HL3_size, cut, events):
                         #paper_bgcolor="black",
                         xaxis_title_text='Classification: 0 - background, 1 - signal', 
                         yaxis_title_text='weight (log)', 
-                        transition_duration=500,
                         showlegend=False,
                         hovermode=False
                         )
    
     return hist
+
+

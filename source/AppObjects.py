@@ -81,8 +81,9 @@ class UIObjects:
                         min=0, max=1, value=0., step=0.05,
                         size=497,
                         #marks={f'{i}':{'label':f'{i}', 'style':{'font-family':'Coustard', 'font-size':8}} for i in [0,.5,1.]},
-                        updatemode = 'drag',                          
-                        labelPosition='bottom',                          
+                        updatemode = 'mouseup',                          
+                        labelPosition='bottom', 
+                        persistence = True                         
                         )
 
     # Label showing significance value    
@@ -117,7 +118,8 @@ class NNDisplay:
 
         self.Power_Button = daq.PowerButton(id='Power_Button',
                                     on=False,
-                                    color=UIO.dark_theme['primary'],                
+                                    color=UIO.dark_theme['primary'], 
+                                    persistence=True               
                                     )
 
         # number of hidden layers selector
