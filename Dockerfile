@@ -15,7 +15,7 @@ RUN apt-get update \
     && apt-get install -y python3 \
 	python3-dev git unzip python3-pip python3.11-venv
 
-RUN python3 -m venv env
+RUN python3.11 -m venv env
 
 RUN ./env/bin/pip install -r requirements.txt
 
