@@ -19,5 +19,5 @@ RUN pip install -r requirements.txt
 
 RUN tar -xzvf build.tar.gz
 
-CMD ["./env/bin/python3", "runApp.py"]
+CMD ["python3", "runApp.py"]
 
