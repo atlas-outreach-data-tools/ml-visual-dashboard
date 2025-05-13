@@ -15,7 +15,7 @@ RUN apt-get update \
     && apt-get install -y python3 \
 	python3-dev git unzip python3-pip
 
-RUN ./env/bin/pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 RUN tar -xzvf build.tar.gz
 
