@@ -49,8 +49,8 @@ to parts of this Web-App, please refer to the following:
 ## Maintainers and developers
 
 - Caley Yardley, University of Sussex
-caley.luce.yardley@cern.ch
-Developer & maintainer
+(caley.luce.yardley@cern.ch).
+Developer & maintainer.
 
-- Andrey Kukhmay, University of Sussex
-Prototype developer
+- Andrey Kukhmay, University of Sussex.
+Prototype developer.
