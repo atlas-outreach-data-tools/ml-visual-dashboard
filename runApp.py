@@ -263,4 +263,4 @@ NN.layout = dbc.Container([
     html.Br(),
     ])
 
-NN.run_server(debug=True, port=7777)
+NN.run_server(debug=True, port=8080)
