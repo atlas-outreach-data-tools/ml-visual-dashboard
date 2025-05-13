@@ -13,9 +13,7 @@ COPY . .
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y python3 \
-	python3-dev git unzip python3-pip python3.11-venv
-
-RUN python3.11 -m venv env
+	python3-dev git unzip python3-pip
 
 RUN ./env/bin/pip install -r requirements.txt
 
