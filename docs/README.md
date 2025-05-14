@@ -52,5 +52,9 @@ to parts of this Web-App, please refer to the following:
 (caley.luce.yardley@cern.ch).
 Developer & maintainer.
 
+- Giovanni Guerrieri, CERN
+(giovanni.guerrieri@cern.ch).
+Maintainer.
+
 - Andrey Kukhmay, University of Sussex.
 Prototype developer.
