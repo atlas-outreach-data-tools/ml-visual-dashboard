@@ -269,7 +269,7 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
     
     # define the data set to plot
     df = data_backend.df_scatter.copy()
-    Pallete = {'Non-resonant_ll':'skyblue', 'Z+jets':'salmon', 'WZ':'lightgreen', 'ZZ':'wheat', 'DM_300':'navy'}
+    Pallete = {event:color for event,color in zip(UI_objects.Events_sim,UI_objects.Pallete_legend)}
     #featX = 'ETmiss'
     Hover = 'closest'
     #Hover_data = {'Event':True, featX:True, featY:True}
@@ -278,7 +278,7 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
         Title = "Events in simulated data"        
     elif active_tab == "tab-1":
         Title = "Events in 'real' data"
-        Pallete = {'Non-resonant_ll':'DimGray', 'Z+jets':'DimGray', 'WZ':'DimGray', 'ZZ':'DimGray', 'DM_300':'DimGray'}
+        Pallete = {event:'DimGray' for event in UI_objects.Events_sim}
         Hover = False
         #Hover_data = {'Event':False, featX:True, featY:True}
 
