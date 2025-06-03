@@ -39,7 +39,10 @@ PageText = {
                           signal and its backgrounds. Are some variables more powerful than others? Which backgrounds are reducible and which are irreducible?",
 
 	"CutOptimisation2" : 
-			"Text on what someone should expect to see.",
+			"After playing around with various cuts on the events, you should find that it is incredibly difficult to separate-out the DM signal from background. \
+			You might have managed to observe some differences in trends. For example, the DM signal is concentrated more densely in some of the plotting \
+			variables than background events yet the Z-jets and non-resonant dilepton events still prove challenging to separate from the signal process. \n \
+			So we are going to have to try something a little more advanced, or a 'multi-variate' analysis technique called machine learning!",
 
 
 	"MLInfo1" :  
@@ -85,8 +88,8 @@ PageText = {
 			"As you may have observed, even after our hyper-parameter optimisation, we still reach a limitation in the maximum separation of our dark matter signal from its background. \
 			At any given MLP output probability, the model will output some number of both signal and background events with this classification. Therefore, rather than attempt to seek \
 			some 100% pure signal selection, particle physics aims to maximise the **significance** of selected signal above its background in any given selection. This is a *statistical* \
-			measure for how well a selection targets the signal of interest where the higher the significance (measured in $\sigma$), the better the selection. In particle physics, 3$\sigma$ \
-			is brilliant for raising a few eyebrows, but 5$\sigma$ is the 'gold standard' when trying to claim a discovery. So the final step is to look for a selection cut on our machine learning output \
+			measure for how well a selection targets the signal of interest where the higher the significance (measured in sigma), the better the selection. In particle physics, 3 sigma \
+			is brilliant for raising a few eyebrows, but 5 sigma is the 'gold standard' when trying to claim a discovery. So the final step is to look for a selection cut on our machine learning output \
 			probability which maximise the measured significance of the signal. \n \
 			Move the slider to select as much signal to the right while cutting out background to the left in order to maximise the signal significance. What's the best you can achieve? What about for \
 			different MLP configurations?",
