@@ -268,6 +268,15 @@ NN.layout = dbc.Container([
                     align='center'),
     html.Br(),
     html.Br(),
+    dbc.Row(dbc.Col([
+                    dcc.Markdown(
+                            PageText["Licensing"],
+                            style={'fone-size':16, 'font-family':'Coustard'},
+                            ),
+
+                            ], width={"size" : 6}),
+                    align='center')
+
     ])
 
 NN.run_server(host="0.0.0.0", debug=True, port=8080)
