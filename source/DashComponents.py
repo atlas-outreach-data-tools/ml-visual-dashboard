@@ -25,12 +25,12 @@ def range_slider_y(featY):
           Input("Tabs", "active_tab")
           )
 def update_legend(tab):
-    options = [{"label": html.Div([event], style={'color':color, 'font-size':13, 'font-family':'Coustard Black'}),
+    options = [{"label": html.Div([UI_objects.LaTeXDict.get(event)], style={'color':color, 'font-size':13, 'font-family':'Coustard Black'}),
                 "value": event} for event,color in zip(UI_objects.Events_sim,UI_objects.Pallete_legend)]  
 
     if tab=="tab-1":
         options = [{"label": html.Div([event_real], style={'color':color, 'font-size':13, 'font-family':'Coustard Black', 'text-opacity':1}),
-                    "value": event_sim, "disabled": True} for event_real,color,event_sim in zip(UI_objects.Events_real,UI_objects.Pallete_legend,UI_objects.Events_sim)]
+                    "value": event_sim, "disabled": True} for event_real,color,event_sim in zip(UI_objects.Events_sim,UI_objects.Pallete_legend,UI_objects.Events_sim)]
 
     return options
 
@@ -284,7 +284,7 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
 
     # enable cuts with the sliders
     Xlow, Xhigh = sliderX
-    Ylow, Yhigh = sliderY    
+    Ylow, Yhigh = sliderY
     mask = (df[f'{UI_objects.featX}'] >= Xlow) & (df[f'{UI_objects.featX}'] <= Xhigh) & (df[f'{featY}'] >= Ylow) & (df[f'{featY}'] <= Yhigh)
     df_masked=df[mask]
     df_filt = df_masked[df_masked["Event"].isin(events)]

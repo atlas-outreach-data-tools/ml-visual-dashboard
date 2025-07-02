@@ -32,6 +32,25 @@ class UIObjects:
         self.Features = DB.df_scatter.drop(columns=['Event','totalWeight']).columns.to_list()
         self.featX = 'ETmiss'
 
+        self.LaTeXDict = {'ETmiss' : r"$E_{T}^{\text{miss}}$ [GeV]",
+                            'ETmiss_over_HT' : r"$E_{T}^{\text{miss}}/H_{T}$",
+                            'sum_lep_charge' : r"$\Sigma{}Q_{lepton}$",
+                            'lead_lep_pt' : r"$p_{T}^{\text{lep} 1}$ [GeV]",
+                            'sublead_lep_pt' : r"$p_{T}^{\text{lep} 2}$ [GeV]",
+                            'mll' : r"$m_{ll}$ [GeV]",
+                            'dRll' : r"$\Delta{}R(l,l)$",
+                            'dphi_pTll_ETmiss' : r"$\Delta{}R(p_{T}^{ll}, E_{T}^{\text{miss}})$",
+                            'fractional_pT_difference' : "NOT SURE", #Check this
+                            'ZZ' : r"$ZZ+$jets",
+                            'WZ' : r"$WZ+$jets",
+                            'Z+jets' : r"$Z+$jets",
+                            'Non-resonant_ll' : r"Non-resonant $ll$",
+                            'DM_300' : r"DM $M=300$ GeV"
+                        }
+        self.inLaTeXDict = {}
+        for key, value in self.LaTeXDict.items():
+            self.inLaTeXDict[value] = key
+
         self.Events_sim = DB.df_scatter["Event"].unique()
         self.Events_real = self.Events_sim.copy()
 
@@ -39,8 +58,15 @@ class UIObjects:
 
     ########## Scatter plot components ##########
         # defines radioitems group to choose Y-feature
-        self.Y_options = self.Features.copy()
-        self.Y_options.remove(self.featX)
+        tmp = self.Features.copy()
+        tmp.remove(self.featX)
+        self.Y_options = []
+        for key in tmp:
+            single_option = {}
+            single_option['label'] = self.LaTeXDict.get(key)
+            single_option['value'] = key
+            self.Y_options.append(single_option)
+
         self.ChooseY = dbc.RadioItems(id='ChooseY',
                          options=self.Y_options,
                          value = "dRll",
@@ -71,8 +97,14 @@ class UIObjects:
                     style={'font-family':'Coustard Black', 'font-size':14},
                             )
     #### Def events' checklist ######
+        legendOpts = []
+        for i in self.Events_sim:
+            single_option = {}
+            single_option['label'] = self.LaTeXDict.get(i)
+            single_option['value'] = i
+            legendOpts.append(single_option)
         self.Legend_Scat = dbc.Checklist(
-                            id="Legend_Scat", value=self.Events_sim,
+                            id="Legend_Scat", options=legendOpts, value=[i for i in self.Events_sim],
                             #labelStyle={"display": "flex", "align-items": "right"},
                             ) 
 
@@ -99,7 +131,7 @@ class NNDisplay:
         Shortlist = []  # [{'label':'All Data', 'value':'data'}]
         for i in DB.df_shortlist.index:
             single_option = {}
-            single_option['label']=f'{i} - '+DB.df_shortlist.Event[i]
+            single_option['label']=f'{i} - '+UIO.LaTeXDict.get(DB.df_shortlist.Event[i])
             single_option['value']=i
             Shortlist.append(single_option)
         self.Data_Dropdown = dcc.Dropdown(id='Data_Dropdown',
