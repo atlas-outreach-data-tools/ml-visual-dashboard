@@ -63,14 +63,13 @@ class UIObjects:
         self.Y_options = []
         for key in tmp:
             single_option = {}
-            single_option['label'] = self.LaTeXDict.get(key)
+            single_option['label'] = dcc.Markdown(self.LaTeXDict.get(key), style={'color':'SteelBlue', 'font-size':14, 'font-family':'Coustard Black'}, mathjax=True)
             single_option['value'] = key
             self.Y_options.append(single_option)
 
         self.ChooseY = dbc.RadioItems(id='ChooseY',
                          options=self.Y_options,
                          value = "dRll",
-                         style={'font-family':'Coustard Black', 'font-size':12, 'color':'SteelBlue'}, 
                         )
 
         min_value = round(DB.df_scatter[f'{self.featX}'].min(), 2)
@@ -131,7 +130,7 @@ class NNDisplay:
         Shortlist = []  # [{'label':'All Data', 'value':'data'}]
         for i in DB.df_shortlist.index:
             single_option = {}
-            single_option['label']=f'{i} - '+UIO.LaTeXDict.get(DB.df_shortlist.Event[i])
+            single_option['label']=dcc.Markdown(f'{i} - '+UIO.LaTeXDict.get(DB.df_shortlist.Event[i]), mathjax=True) 
             single_option['value']=i
             Shortlist.append(single_option)
         self.Data_Dropdown = dcc.Dropdown(id='Data_Dropdown',
