@@ -306,6 +306,8 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
                       font_family="Coustard", font_size=11, font_color="SlateGrey",
                       showlegend=False,
                       title=dict(text=Title, font=dict(family='Coustard Black', size=20), x=0.44, y=0.95),
+                      xaxis_title = UI_objects.LaTeXDict[UI_objects.featX],
+                      yaxis_title = UI_objects.LaTeXDict[featY],
                       # legend_title=dict(font=dict(family='Coustard Black',color='DimGrey')),
                       # legend_uirevision='foo',
                       #paper_bgcolor="#303030",
@@ -535,7 +537,7 @@ def update_MLP(id, power, number_hl, HL1_size, HL2_size, HL3_size):
         feature = UI_objects.Features[i]
         ##EVENT HHERE NOT COMPLETE --> FIX!!!!!
         val = str(round(float(event[feature]), 2))
-        label = feature
+        label = UI_objects.LaTeXDict[feature]
         # input nodes shapes and values
         MLP.add_shape(type="rect",
                       xref="paper", yref="paper",
