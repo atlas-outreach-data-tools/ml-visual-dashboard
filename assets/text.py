@@ -29,7 +29,7 @@ PageText = {
 			"In the first instance, particle physicists may try some bold cult-optimisation approach to select candidate events. \
 			 However, this can be challenging. \
                           Suppose we are searching for a WIMP *dark matter* particle among results of a proton-proton collision. \
-                          They are produced when $Z+$boson decays into a pair of WIMPs and a dilepton pair. \
+                          They are produced when a $Z$ boson decays into a pair of WIMPs and a dilepton pair. \
                           Such event would leave traces similar to other known processes which we have observed and continue to see quite regularly.\n \
                          	 Some of these known processes are called **irreducible backgrounds** because their observed behaviour is too similar to \
 	 		 be easily distinguished from the process of interest. Whether or not a background is *irreducible* depends on what we can see in \
@@ -88,8 +88,8 @@ PageText = {
 			"As you may have observed, even after our hyper-parameter optimisation, we still reach a limitation in the maximum separation of our dark matter signal from its background. \
 			At any given MLP output probability, the model will output some number of both signal and background events with this classification. Therefore, rather than attempt to seek \
 			some 100% pure signal selection, particle physics aims to maximise the **significance** of selected signal above its background in any given selection. This is a *statistical* \
-			measure for how well a selection targets the signal of interest where the higher the significance, measured in $\{sigma}$ (pronounced sigma), the better the selection. In particle physics, $3 \{sigma}$ \
-			is brilliant for raising a few eyebrows, but $5 \{sigma}$ is the 'gold standard' when trying to claim a discovery. So the final step is to look for a selection cut on our machine learning output \
+			measure for how well a selection targets the signal of interest where the higher the significance, measured in $\sigma$ (pronounced sigma), the better the selection. In particle physics, $3 \sigma$ \
+			is brilliant for raising a few eyebrows, but $5 \sigma$ is the 'gold standard' when trying to claim a discovery. So the final step is to look for a selection cut on our machine learning output \
 			probability which maximise the measured significance of the signal. \n \
 			Move the slider to select as much signal to the right while cutting out background to the left in order to maximise the signal significance. What's the best you can achieve? What about for \
 			different MLP configurations?",

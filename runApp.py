@@ -16,11 +16,7 @@ if not FilesExist:
 from source.DashComponents import *
 from assets.text import PageHeaders, PageText
 
-#Enable MathJax
-mathjax = ['https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML']
-
-NN = Dash(external_scripts=mathjax,
-		external_stylesheets=[dbc.themes.BOOTSTRAP])
+NN = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 ATLASLogo = dbc.Card(
     [
@@ -145,10 +141,12 @@ NN.layout = dbc.Container([
 
     dbc.Row(dbc.Col([
             dcc.Markdown(PageText["MLInfo1"],
-                         style={'font-size':16, 'font-family':'Coustard'}),
+                         style={'font-size':16, 'font-family':'Coustard'},
+                         mathjax=True),
 
             dcc.Markdown(PageText["MLInfo2"],
-                         style={'font-size':16, 'font-family':'Coustard'}),
+                         style={'font-size':16, 'font-family':'Coustard'},
+                         mathjax=True),
                     ],                                        
                      width={"size": 8, "offset": 2})),
     html.Br(),   
@@ -223,7 +221,8 @@ NN.layout = dbc.Container([
                     width={"size": 8, "offset": 2})),
 
     dbc.Row(dbc.Col(dcc.Markdown(PageText["DesignOptimise"],
-                          style={'font-size':16, 'font-family':'Coustard'}),     
+                          style={'font-size':16, 'font-family':'Coustard'},
+                          mathjax=True),     
                     width={"size": 8, "offset": 2})),
 
     html.Br(),
@@ -272,6 +271,7 @@ NN.layout = dbc.Container([
                     dcc.Markdown(
                             PageText["Licensing"],
                             style={'fone-size':16, 'font-family':'Coustard'},
+                            mathjax=True,
                             ),
 
                             ], width={"size" : 6}),
