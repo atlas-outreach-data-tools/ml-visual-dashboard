@@ -22,15 +22,33 @@ def range_slider_y(featY):
 
 @callback(
           Output("Legend_Scat", "options"),
-          Input("Tabs", "active_tab")
+          Input("Tabs", "active_tab"),
+          Input("ChooseY", "value"),
+          Input("SliderY", "value"),
+          Input("SliderX", "value")
           )
-def update_legend(tab):
-    options = [{"label": html.Div([event], style={'color':color, 'font-size':13, 'font-family':'Coustard Black'}),
+def update_legend(tab, featY, sliderY, sliderX):
+
+    df = data_backend.df_scatter.copy()
+    Pallete = {event:color for event,color in zip(UI_objects.Events_sim,UI_objects.Pallete_legend)}
+    Xlow, Xhigh = sliderX
+    Ylow, Yhigh = sliderY
+    mask = (df[f'{UI_objects.featX}'] >= Xlow) & (df[f'{UI_objects.featX}'] <= Xhigh) & (df[f'{featY}'] >= Ylow) & (df[f'{featY}'] <= Yhigh)
+    df_filt=df[mask]
+
+    #for z,event in enumerate(UI_objects.Events_sim):
+    #        now = round(sum(df_filt[df_filt['Event']==event]['totalWeight']),1)
+    #        full = round(sum(df[df['Event']==event]['totalWeight']),1)
+
+    options = [{"label": dcc.Markdown(UI_objects.LaTeXDict.get(event)+"\t::\t"+
+                f"{round(sum(df_filt[df_filt['Event']==event]['totalWeight']),1)}"+"\t"+ 
+                f"({round(sum(df[df['Event']==event]['totalWeight']),1)})", 
+                style={'color':color, 'font-size':13, 'font-family':'Coustard Black'}, mathjax=True),
                 "value": event} for event,color in zip(UI_objects.Events_sim,UI_objects.Pallete_legend)]  
 
     if tab=="tab-1":
         options = [{"label": html.Div([event_real], style={'color':color, 'font-size':13, 'font-family':'Coustard Black', 'text-opacity':1}),
-                    "value": event_sim, "disabled": True} for event_real,color,event_sim in zip(UI_objects.Events_real,UI_objects.Pallete_legend,UI_objects.Events_sim)]
+                    "value": event_sim, "disabled": True} for event_real,color,event_sim in zip(UI_objects.Events_sim,UI_objects.Pallete_legend,UI_objects.Events_sim)]
 
     return options
 
@@ -284,7 +302,7 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
 
     # enable cuts with the sliders
     Xlow, Xhigh = sliderX
-    Ylow, Yhigh = sliderY    
+    Ylow, Yhigh = sliderY
     mask = (df[f'{UI_objects.featX}'] >= Xlow) & (df[f'{UI_objects.featX}'] <= Xhigh) & (df[f'{featY}'] >= Ylow) & (df[f'{featY}'] <= Yhigh)
     df_masked=df[mask]
     df_filt = df_masked[df_masked["Event"].isin(events)]
@@ -306,6 +324,8 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
                       font_family="Coustard", font_size=11, font_color="SlateGrey",
                       showlegend=False,
                       title=dict(text=Title, font=dict(family='Coustard Black', size=20), x=0.44, y=0.95),
+                      xaxis_title = UI_objects.LaTeXDict.get(UI_objects.featX),
+                      yaxis_title = UI_objects.LaTeXDict.get(featY),
                       # legend_title=dict(font=dict(family='Coustard Black',color='DimGrey')),
                       # legend_uirevision='foo',
                       #paper_bgcolor="#303030",
@@ -343,21 +363,7 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
                       fillcolor="White", line_color="White", line_width=0.25,
                       x0=1.08-0.04, x1=1.27-0.04, y0=0.94-0.035, y1=0.94+0.035,    
                       label=dict(text='Events:', textposition='middle right', font_size=16, font_family='Coustard Black', font_color='DimGrey'),
-                      ) 
-        # counts of events
-        for z,event in enumerate(UI_objects.Events_sim):
-            now = round(sum(df_filt[df_filt['Event']==event]['totalWeight']),1)
-            full = round(sum(df[df['Event']==event]['totalWeight']),1)
-            fig.add_shape(type="rect", xref="paper", yref="paper",
-                          fillcolor="White", line_color="White", line_width=0.25,
-                          x0=1.08-0.04, x1=1.17-0.04, y0=0.88-0.074*(z+1)-0.03, y1=0.88-0.074*(z+1)+0.03,                  
-                          label=dict(text=f'{now}', textposition='middle right', font_size=13, font_color='SteelBlue', font_family='Coustard Black',) 
-                          )
-            fig.add_shape(type="rect", xref="paper", yref="paper",
-                          fillcolor="White", line_color="White", line_width=0.25,
-                          x0=1.17-0.04, x1=1.27-0.04, y0=0.88-0.074*(z+1)-0.03, y1=0.88-0.074*(z+1)+0.03,                  
-                          label=dict(text=f'({full})', textposition='middle left', font_size=13, font_color='SteelBlue', font_family='Coustard',) 
-                          )      
+                      )
     
     return fig
 
@@ -533,26 +539,25 @@ def update_MLP(id, power, number_hl, HL1_size, HL2_size, HL3_size):
 
     for i in range(f):
         feature = UI_objects.Features[i]
-        ##EVENT HHERE NOT COMPLETE --> FIX!!!!!
         val = str(round(float(event[feature]), 2))
-        label = feature
+        label = UI_objects.LaTeXDict.get(feature)
         # input nodes shapes and values
         MLP.add_shape(type="rect",
                       xref="paper", yref="paper",
                       fillcolor="WhiteSmoke",
                       x0=x_pad-0.01, y0=(i+1)/(f+1)-0.03, x1=x_pad+0.035, y1=(i+1)/(f+1)+0.03,
                       line_color="navy", line_width=0.25,
-                      label=dict(text=val, font=dict(size=10, color=color_input))
-                        #text=event.iloc[i+2].round(2), font=dict(size=10, color=color_input))
-                      )
+                      label=dict(texttemplate=val, font=dict(size=10, color=color_input)))
+
         # input feautures labels
         MLP.add_shape(type="rect", xref="paper", yref="paper",
                       fillcolor="white",
                       x0=-0.06, y0=(i+1)/(f+1)-0.03, x1=0.08, y1=(i+1)/(f+1)+0.03,
-                      line_color="white",
-                      label=dict(text=label, textposition="middle right", 
-                                font=dict(size=11, color='SteelBlue', family='Coustard Black'))
-                      )
+                      line_color="white")
+
+        MLP.add_annotation(x=0.04, y=(i+1)/(f+1), xanchor="center", yanchor="middle", 
+                            showarrow=False, text=label, font=dict(size=11, color='SteelBlue', family='Coustard Black'))
+
     # input header
     MLP.add_shape(type="rect", xref="paper", yref="paper",
                   fillcolor="white", line_color="white",
