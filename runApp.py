@@ -110,7 +110,7 @@ NN.layout = dbc.Container([
                       ),
             dbc.Col([
                     dbc.Col([UI_objects.Tabs,
-                            dcc.Graph(id="Scatter",                                      
+                            dcc.Graph(mathjax=True, id="Scatter",                                      
                                       config={
                                               'displayModeBar':False,
                                               #'modeBarButtonsToRemove': ['zoom2d'],
@@ -222,7 +222,7 @@ NN.layout = dbc.Container([
     
     # Sankey diagramm section
     dbc.Row(
-            dbc.Col(dcc.Graph(id="MLP", config={'displayModeBar':False}),
+            dbc.Col(dcc.Graph(id="MLP", config={'displayModeBar':False}, mathjax=True),
                     #width={"size": 10, "offset": 1}
                     )
             ),

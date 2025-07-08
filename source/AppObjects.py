@@ -32,20 +32,20 @@ class UIObjects:
         self.Features = DB.df_scatter.drop(columns=['Event','totalWeight']).columns.to_list()
         self.featX = 'ETmiss'
 
-        self.LaTeXDict = {'ETmiss' : r"$E_{T}^{\text{miss}}$ [GeV]",
+        self.LaTeXDict = {'ETmiss' : r"$E_{T}^{\text{miss}}~\text([GeV])$",
                             'ETmiss_over_HT' : r"$E_{T}^{\text{miss}}/H_{T}$",
                             'sum_lep_charge' : r"$\Sigma{}Q_{lepton}$",
-                            'lead_lep_pt' : r"$p_{T}^{\text{lep} 1}$ [GeV]",
-                            'sublead_lep_pt' : r"$p_{T}^{\text{lep} 2}$ [GeV]",
+                            'lead_lep_pt' : r"$p_{T}^{\text{lep} 1}~\text([GeV])$",
+                            'sublead_lep_pt' : r"$p_{T}^{\text{lep} 2}~\text([GeV])$",
                             'mll' : r"$m_{ll}$ [GeV]",
                             'dRll' : r"$\Delta{}R(l,l)$",
                             'dphi_pTll_ETmiss' : r"$\Delta{}R(p_{T}^{ll}, E_{T}^{\text{miss}})$",
-                            'fractional_pT_difference' : "NOT SURE", #Check this
+                            'fractional_pT_difference' : r"Fractional $p_{T}$ difference", 
                             'ZZ' : r"$ZZ+$jets",
                             'WZ' : r"$WZ+$jets",
                             'Z+jets' : r"$Z+$jets",
                             'Non-resonant_ll' : r"Non-resonant $ll$",
-                            'DM_300' : r"DM $M=300$ GeV"
+                            'DM_300' : r"DM $M=300~\text([GeV])$"
                         }
         self.inLaTeXDict = {}
         for key, value in self.LaTeXDict.items():
@@ -133,6 +133,7 @@ class NNDisplay:
             single_option['label']=dcc.Markdown(f'{i} - '+UIO.LaTeXDict.get(DB.df_shortlist.Event[i]), mathjax=True) 
             single_option['value']=i
             Shortlist.append(single_option)
+
         self.Data_Dropdown = dcc.Dropdown(id='Data_Dropdown',
                                 options = Shortlist,
                                 optionHeight=18,
@@ -140,12 +141,6 @@ class NNDisplay:
                                 maxHeight = 500,
                                 style={'font-family':'Coustard Black', 'font-size':10, 'color':'SlateGrey'}
                                 )
-
-        # self.Scaler_Switch = daq.BooleanSwitch(id='Scaler_Switch',
-        #                           on=False, 
-        #                           labelPosition="bottom",
-        #                           #vertical=True, #persistence=True 
-        #                           )
 
         self.Power_Button = daq.PowerButton(id='Power_Button',
                                     on=False,

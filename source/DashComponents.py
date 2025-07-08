@@ -363,21 +363,7 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
                       fillcolor="White", line_color="White", line_width=0.25,
                       x0=1.08-0.04, x1=1.27-0.04, y0=0.94-0.035, y1=0.94+0.035,    
                       label=dict(text='Events:', textposition='middle right', font_size=16, font_family='Coustard Black', font_color='DimGrey'),
-                      ) 
-        # counts of events
-        #for z,event in enumerate(UI_objects.Events_sim):
-        #    now = round(sum(df_filt[df_filt['Event']==event]['totalWeight']),1)
-        #    full = round(sum(df[df['Event']==event]['totalWeight']),1)
-        #    fig.add_shape(type="rect", xref="paper", yref="paper",
-        #                  fillcolor="White", line_color="White", line_width=0.25,
-        #                  x0=1.08-0.04, x1=1.17-0.04, y0=0.88-0.074*(z+1)-0.03, y1=0.88-0.074*(z+1)+0.03,                  
-        #                  label=dict(text=f'{now}', textposition='middle right', font_size=13, font_color='SteelBlue', font_family='Coustard Black',) 
-        #                  )
-        #    fig.add_shape(type="rect", xref="paper", yref="paper",
-        #                  fillcolor="White", line_color="White", line_width=0.25,
-        #                  x0=1.17-0.04, x1=1.27-0.04, y0=0.88-0.074*(z+1)-0.03, y1=0.88-0.074*(z+1)+0.03,                  
-        #                  label=dict(text=f'({full})', textposition='middle left', font_size=13, font_color='SteelBlue', font_family='Coustard',) 
-        #                  )      
+                      )
     
     return fig
 
@@ -553,7 +539,6 @@ def update_MLP(id, power, number_hl, HL1_size, HL2_size, HL3_size):
 
     for i in range(f):
         feature = UI_objects.Features[i]
-        ##EVENT HHERE NOT COMPLETE --> FIX!!!!!
         val = str(round(float(event[feature]), 2))
         label = UI_objects.LaTeXDict.get(feature)
         # input nodes shapes and values
@@ -562,17 +547,17 @@ def update_MLP(id, power, number_hl, HL1_size, HL2_size, HL3_size):
                       fillcolor="WhiteSmoke",
                       x0=x_pad-0.01, y0=(i+1)/(f+1)-0.03, x1=x_pad+0.035, y1=(i+1)/(f+1)+0.03,
                       line_color="navy", line_width=0.25,
-                      label=dict(text=val, font=dict(size=10, color=color_input))
-                        #text=event.iloc[i+2].round(2), font=dict(size=10, color=color_input))
-                      )
+                      label=dict(texttemplate=val, font=dict(size=10, color=color_input)))
+
         # input feautures labels
         MLP.add_shape(type="rect", xref="paper", yref="paper",
                       fillcolor="white",
                       x0=-0.06, y0=(i+1)/(f+1)-0.03, x1=0.08, y1=(i+1)/(f+1)+0.03,
-                      line_color="white",
-                      label=dict(text=label, textposition="middle right", 
-                                font=dict(size=11, color='SteelBlue', family='Coustard Black'))
-                      )
+                      line_color="white")
+
+        MLP.add_annotation(x=0.04, y=(i+1)/(f+1), xanchor="center", yanchor="middle", 
+                            showarrow=False, text=label, font=dict(size=11, color='SteelBlue', family='Coustard Black'))
+
     # input header
     MLP.add_shape(type="rect", xref="paper", yref="paper",
                   fillcolor="white", line_color="white",
