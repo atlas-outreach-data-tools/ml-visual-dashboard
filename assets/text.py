@@ -94,7 +94,7 @@ PageText = {
 			Move the slider to select as much signal to the right while cutting out background to the left in order to maximise the signal significance. What's the best you can achieve? What about for \
 			different MLP configurations?",
                             
-	"Conclusions" : "Insert final thoughts",
+	"Conclusions" : "At this point",
 
 	"Licensing" : "Copyright 2025 ATLAS Collaboration. Built with Dash/Plotly."
 }

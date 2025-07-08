@@ -49,6 +49,10 @@ ATLASLogo = dbc.Card(
     ],
     style={"width": "18rem"},
 )
+
+
+GoBackText = "./"
+
 #ATLASLogo = html.Img(src="assets/atlas_logo.png", width=200)
 
 ####################################################################################################################################################
@@ -59,7 +63,42 @@ ATLASLogo = dbc.Card(
 NN.layout = dbc.Container([
 
    ### Title header and preamble ###
-    
+   dbc.Navbar(
+    dbc.Container(
+        [html.A(
+                # Use row and col to control vertical alignment of logo / brand
+                dbc.Row(
+                    [
+                        dbc.Col(html.Img(src="assets/BlueATLASLogo.png", height="60px"),width={"size":3, "order":1},),
+                    ],
+                    align="center",
+                    className="g-0",
+                ),
+            ),
+            dbc.Col(dbc.DropdownMenu(label="See also",
+                            children=[
+                                dbc.DropdownMenuItem("ATLAS Open Data website", href="https://opendata.atlas.cern", external_link=True),
+                                dbc.DropdownMenuItem("The ATLAS website", href="https://atlas.cern", external_link=True),
+                                dbc.DropdownMenuItem("The CERN Open Data Portal", href="https://opendata.cern.ch", external_link=True)],
+                            color="#0b80c3",
+                            style={'font-size':16, 'font-family':'Coustard', 'background':"#0b80c3", 'color':"white"},
+                            nav=True    ),
+                            width={"size":3, "order":3},), 
+            dbc.Col(dbc.Button("Go back", external_link=True, href=GoBackText, 
+                                style={'font-size':16, 'font-family':'Coustard', 'color':"white"}, outline=True), width={"size":3, "order":2},),
+            #dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
+            #dbc.Collapse(
+            #   search_bar,
+            #    id="navbar-collapse",
+            #    is_open=False,
+            #    navbar=True,
+            #),
+        ]
+    ),
+    color="#0b80c3",
+    dark=True,
+    ),  
+
     dbc.Row([ 
         dbc.Col(ATLASLogo, width="auto"),
         dbc.Col(html.H1('Visualising machine learning in a search for dark matter',
