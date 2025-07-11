@@ -45,7 +45,7 @@ class UIObjects:
                             'WZ' : r"$WZ+$jets",
                             'Z+jets' : r"$Z+$jets",
                             'Non-resonant_ll' : r"Non-resonant $ll$",
-                            'DM_300' : r"DM $M=300~\text([GeV])$"
+                            'DM_300' : r"DM $M=300~\text{[GeV]}$"
                         }
         self.inLaTeXDict = {}
         for key, value in self.LaTeXDict.items():
