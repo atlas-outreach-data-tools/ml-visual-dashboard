@@ -40,7 +40,7 @@ class UIObjects:
                             'mll' : r"$m_{ll}~\text{GeV}$",
                             'dRll' : r"$\Delta{}R(l,l)$",
                             'dphi_pTll_ETmiss' : r"$\Delta{}R(p_{T}^{ll}, E_{T}^{\text{miss}})$",
-                            'fractional_pT_difference' : r"Fractional $p_{T}$ difference", 
+                            'fractional_pT_difference' : r"$\text{Fractional}~p_{T}~\text{difference}$", 
                             'ZZ' : r"$ZZ+$jets",
                             'WZ' : r"$WZ+$jets",
                             'Z+jets' : r"$Z+$jets",
