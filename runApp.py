@@ -16,21 +16,7 @@ if not FilesExist:
 from source.DashComponents import *
 from assets.text import PageHeaders, PageText
 
-##USE MATHJAX CDN FOR HANDLING OF LATEX IN PLOTS
-
-MATHJAX_CDN = '''
-#https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/
-#MathJax.js?config=TeX-MML-AM_CHTML'''
-
-external_scripts = [
-                    {'type': 'text/javascript',
-                     'id': 'MathJax-script',
-                     'src': MATHJAX_CDN,
-                     },
-                    ]
-
-
-NN = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP], external_scripts=external_scripts)
+NN = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 ATLASLogo = dbc.Card(
     [
@@ -52,8 +38,6 @@ ATLASLogo = dbc.Card(
 
 
 GoBackText = "./"
-
-#ATLASLogo = html.Img(src="assets/atlas_logo.png", width=200)
 
 ####################################################################################################################################################
 ####################################################################################################################################################
