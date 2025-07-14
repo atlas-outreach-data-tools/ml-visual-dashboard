@@ -555,7 +555,7 @@ def update_MLP(id, power, number_hl, HL1_size, HL2_size, HL3_size):
                       x0=-0.06, y0=(i+1)/(f+1)-0.03, x1=0.08, y1=(i+1)/(f+1)+0.03,
                       line_color="white")
 
-        MLP.add_annotation(x=0.04, y=(i+1)/(f+1), xanchor="center", yanchor="middle", 
+        MLP.add_annotation(x=x_pad-0.02, y=(i+1)/(f+1), xanchor="right", yanchor="middle", 
                             showarrow=False, text=label, font=dict(size=11, color='SteelBlue', family='Coustard Black'))
 
     # input header
