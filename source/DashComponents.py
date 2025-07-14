@@ -331,7 +331,7 @@ def update_scatter(featY, sliderX, sliderY, active_tab, events):
                       #paper_bgcolor="#303030",
                       #width=700,
                       margin=dict(l=0, r=130, b=0, t=50),
-                      hovermode=Hover
+                      hovermode=False
                       )
 
     fig.update_traces(marker={'line':{'width':2, 'color':'white'},
@@ -773,7 +773,7 @@ def update_hist(cut, power, number_hl, HL1_size, HL2_size, HL3_size, events):
                         xaxis_title_text='Classification: 0 - background, 1 - signal', 
                         yaxis_title_text='weight (log)', 
                         showlegend=False,
-                        hovermode=False
+                        #hovermode=False
                         )
    
     return hist
