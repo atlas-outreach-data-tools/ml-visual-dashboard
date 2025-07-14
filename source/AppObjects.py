@@ -32,12 +32,12 @@ class UIObjects:
         self.Features = DB.df_scatter.drop(columns=['Event','totalWeight']).columns.to_list()
         self.featX = 'ETmiss'
 
-        self.LaTeXDict = {'ETmiss' : r"$E_{T}^{\text{miss}}~\text{GeV}$",
+        self.LaTeXDict = {'ETmiss' : r"$E_{T}^{\text{miss}}~\text{[GeV]}$",
                             'ETmiss_over_HT' : r"$E_{T}^{\text{miss}}/H_{T}$",
                             'sum_lep_charge' : r"$\Sigma{}Q_{lepton}$",
-                            'lead_lep_pt' : r"$p_{T}^{\text{lep} 1}~\text{GeV}$",
-                            'sublead_lep_pt' : r"$p_{T}^{\text{lep} 2}~\text{GeV}$",
-                            'mll' : r"$m_{ll}~\text{GeV}$",
+                            'lead_lep_pt' : r"$p_{T}^{\text{lep} 1}~\text{[GeV]}$",
+                            'sublead_lep_pt' : r"$p_{T}^{\text{lep} 2}~\text{[GeV]}$",
+                            'mll' : r"$m_{ll}~\text{[GeV]}$",
                             'dRll' : r"$\Delta{}R(l,l)$",
                             'dphi_pTll_ETmiss' : r"$\Delta{}R(p_{T}^{ll}, E_{T}^{\text{miss}})$",
                             'fractional_pT_difference' : r"$\text{Fractional}~p_{T}~\text{difference}$", 
